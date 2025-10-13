@@ -35,6 +35,6 @@ public abstract class BaseServiceSupport {
     protected <T> T require(Supplier<T> supplier, String msg) {
         T value = supplier.get();
         if (value == null) throw new RuntimeException(msg);
-
+        return value;
     }
 }
