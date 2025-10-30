@@ -1,5 +1,7 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.inscripcion.CreateInscripcionDTO;
+import com.poo.proyecto.dto.inscripcion.InscripcionResponseDTO;
 import com.poo.proyecto.entity.Inscripcion;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,9 +10,9 @@ import java.math.BigDecimal;
 
 public interface InscripcionService {
 
-    Inscripcion create(Long participanteId, Long competenciaId, BigDecimal precioPagado);
+    InscripcionResponseDTO create(CreateInscripcionDTO dto);
 
-    Inscripcion get(Long id);
+    InscripcionResponseDTO get(Long id);
 
-    Page<Inscripcion> list(Pageable pageable);
+    Page<InscripcionResponseDTO> list(Pageable pageable);
 }
