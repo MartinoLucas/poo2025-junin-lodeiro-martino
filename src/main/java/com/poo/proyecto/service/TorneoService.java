@@ -1,5 +1,8 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.torneo.CreateTorneoDTO;
+import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
+import com.poo.proyecto.dto.torneo.UpdateTorneoDTO;
 import com.poo.proyecto.entity.Torneo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,11 +11,11 @@ import java.time.LocalDate;
 
 public interface TorneoService {
 
-    Torneo create(String nombre, String descripcion, LocalDate inicio,LocalDate fin);
-    Torneo update(Long id, String nombre, String descripcion, LocalDate inicio,LocalDate fin);
-    Torneo publish(Long id);
-    Torneo finalizeTournament(Long id);
+    TorneoResponseDTO create(CreateTorneoDTO dto);
+    TorneoResponseDTO update(Long id, UpdateTorneoDTO dto);
+    TorneoResponseDTO publish(Long id);
+    TorneoResponseDTO finalizeTournament(Long id);
     void deleteDraft(Long id);
-    Torneo get(Long id);
-    Page<Torneo> listPublished(Pageable pageable);
+    TorneoResponseDTO get(Long id);
+    Page<TorneoResponseDTO> listPublished(Pageable pageable);
 }

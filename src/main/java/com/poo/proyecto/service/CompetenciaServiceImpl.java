@@ -1,9 +1,13 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
+import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
+import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
 import com.poo.proyecto.entity.Competencia;
 import com.poo.proyecto.entity.Torneo;
 import com.poo.proyecto.entity.TorneoStatus;
 import com.poo.proyecto.entity.base.Money;
+import com.poo.proyecto.mapper.CompetenciaMapper;
 import com.poo.proyecto.repository.CompetenciaRepository;
 import com.poo.proyecto.repository.TorneoRepository;
 import org.springframework.data.domain.Page;
@@ -17,47 +21,57 @@ public class CompetenciaServiceImpl extends BaseServiceSupport implements Compet
 
     private final CompetenciaRepository repo;
     private final TorneoRepository torneoRepo;
+    private final CompetenciaMapper mapper;
 
-    public CompetenciaServiceImpl(CompetenciaRepository repo, TorneoRepository torneoRepo) {
+    public CompetenciaServiceImpl(CompetenciaRepository repo, TorneoRepository torneoRepo, CompetenciaMapper mapper) {
         this.repo = repo;
         this.torneoRepo = torneoRepo;
+        this.mapper = mapper;
     }
 
     @Override
     @Transactional
-    public Competencia create(Long torneoId, String nombre, Money precioBase, int cupo) {
-        Torneo torneo = orNotFound(torneoRepo.findById(torneoId), "Torneo no encontrado");
+    public CompetenciaResponseDTO create(CreateCompetenciaDTO dto) {
+        Torneo torneo = orNotFound(torneoRepo.findById(dto.getTorneoId()), "Torneo no encontrado");
 
         check(torneo.getEstado() == TorneoStatus.BORRADOR,
-                "Solo se pueden agregar competencias en BORRADOR");
+                "Solo se pueden agregar competencias a torneos en BORRADOR");
 
-        check(!repo.existsByTorneo_IdAndNombreIgnoreCase(torneoId, nombre),
+        check(!repo.existsByTorneo_IdAndNombreIgnoreCase(dto.getTorneoId(), dto.getNombre()),
                 "Ya existe una competencia con ese nombre en el torneo");
 
-        Competencia c = new Competencia();
-        c.setTorneo(torneo);
-        c.setNombre(nombre);
-        c.setPrecioBase(precioBase);
-        c.setCupo(cupo);
-        return repo.save(c);
+        Competencia c = mapper.toEntity(dto);
+
+        return mapper.toResponse(repo.save(c));
     }
 
     @Override
     @Transactional
-    public Competencia update(Long id, String nombre, Money precioBase, int cupo) {
+    public CompetenciaResponseDTO update(Long id, UpdateCompetenciaDTO dto) {
         Competencia c = orNotFound(repo.findByIdWithTorneo(id), "Competencia no encontrada");
 
         check(c.getTorneo().getEstado() == TorneoStatus.BORRADOR,
-                "Solo se pueden editar competencias en torneos BORRADOR");
+                "Solo se pueden editar competencias en torneos en BORRADOR");
 
-        check(c.getNombre().equalsIgnoreCase(nombre) ||
-                        !repo.existsByTorneo_IdAndNombreIgnoreCase(c.getTorneo().getId(), nombre),
-                "Nombre de competencia ya en uso en este torneo");
+        if (dto.getNombre() != null) {
+            check(!repo.existsByTorneo_IdAndNombreIgnoreCase(c.getTorneo().getId(), dto.getNombre()),
+                    "Nombre de competencia ya en uso en este torneo");
+        }
 
-        c.setNombre(nombre);
-        c.setPrecioBase(precioBase);
-        c.setCupo(cupo);
-        return c;
+        if (dto.getTorneoId() != null) {
+            Torneo newTorneo = orNotFound(torneoRepo.findById(dto.getTorneoId()), "Torneo no encontrado");
+
+            check(newTorneo.getEstado() == TorneoStatus.BORRADOR,
+                    "Solo se pueden asociar competencias a torneos en BORRADOR");
+
+            check(!repo.existsByTorneo_IdAndNombreIgnoreCase(dto.getTorneoId(),
+                    dto.getNombre() != null ? dto.getNombre() : c.getNombre()),
+                    "Ya existe una competencia con ese nombre en el nuevo torneo");
+        }
+
+        mapper.updateEntity(dto, c);
+
+        return mapper.toResponse(c);
     }
 
     @Override
@@ -73,16 +87,17 @@ public class CompetenciaServiceImpl extends BaseServiceSupport implements Compet
 
     @Override
     @Transactional(readOnly = true)
-    public Competencia get(Long id) {
-        return orNotFound(repo.findById(id), "Competencia no encontrada");
+    public CompetenciaResponseDTO get(Long id) {
+        Competencia c = orNotFound(repo.findById(id), "Competencia no encontrada");
+        return mapper.toResponse(c);
     }
 
 
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Competencia> listByTorneo(Long torneoId, Pageable pageable) {
-        return repo.findByTorneo_Id(torneoId, pageable);
+    public Page<CompetenciaResponseDTO> listByTorneo(Long torneoId, Pageable pageable) {
+        return repo.findByTorneo_Id(torneoId, pageable).map(mapper::toResponse);
     }
 }
 

@@ -1,16 +1,20 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.participante.CreateParticipanteDTO;
+import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
+import com.poo.proyecto.dto.participante.UpdateParticipanteDTO;
+import com.poo.proyecto.dto.role.UpdateRoleDTO;
 import com.poo.proyecto.entity.Participante;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface ParticipanteService {
 
-    Participante create(String nombre, String apellido, String tipoDocumento, String numeroDocumento, String email, Long userId);
+    ParticipanteResponseDTO create(CreateParticipanteDTO dto);
 
-    Participante update(Long id, String nombre, String apellido, String email);
+    ParticipanteResponseDTO update(Long id, UpdateParticipanteDTO dto);
 
-    Participante get(Long id);
+    ParticipanteResponseDTO get(Long id);
 
-    Page<Participante> list(Pageable pageable);
+    Page<ParticipanteResponseDTO> list(Pageable pageable);
 }

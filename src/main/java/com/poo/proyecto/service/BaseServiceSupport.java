@@ -2,6 +2,7 @@ package com.poo.proyecto.service;
 
 
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -20,7 +21,7 @@ public abstract class BaseServiceSupport {
      * @param <T>
      */
     protected <T> T orNotFound(Optional<T> opt, String msg) {
-        return opt.orElseThrow(() -> new RuntimeException(msg));
+        return opt.orElseThrow(() -> new EntityNotFoundException(msg));
 
     }
 
@@ -32,6 +33,7 @@ public abstract class BaseServiceSupport {
     protected Pageable page(int page, int size){
         return PageRequest.of(Math.max(page,0), Math.max(size,1));
     }
+
     protected <T> T require(Supplier<T> supplier, String msg) {
         T value = supplier.get();
         if (value == null) throw new RuntimeException(msg);

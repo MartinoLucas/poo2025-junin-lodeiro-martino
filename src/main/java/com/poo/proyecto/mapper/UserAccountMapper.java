@@ -10,6 +10,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = { EmailMapper.class, RoleMapper.class })
 public interface UserAccountMapper {
 
+    @Mapping(target = "passwordHash", ignore = true)
     UserAccount toEntity(CreateUserDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

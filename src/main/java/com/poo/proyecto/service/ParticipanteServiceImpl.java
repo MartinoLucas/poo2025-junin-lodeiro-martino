@@ -1,8 +1,13 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.participante.CreateParticipanteDTO;
+import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
+import com.poo.proyecto.dto.participante.UpdateParticipanteDTO;
 import com.poo.proyecto.entity.Participante;
+import com.poo.proyecto.entity.UserAccount;
 import com.poo.proyecto.entity.base.Documento;
 import com.poo.proyecto.entity.base.Email;
+import com.poo.proyecto.mapper.ParticipanteMapper;
 import com.poo.proyecto.repository.ParticipanteRepository;
 import com.poo.proyecto.repository.UserAccountRepository;
 
@@ -16,48 +21,60 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
 
     private final ParticipanteRepository repo;
     private final UserAccountRepository userRepo;
+    private final ParticipanteMapper mapper;
 
-    public ParticipanteServiceImpl(ParticipanteRepository repo, UserAccountRepository userRepo) {
+    public ParticipanteServiceImpl(ParticipanteRepository repo, UserAccountRepository userRepo, ParticipanteMapper mapper) {
         this.repo = repo;
         this.userRepo = userRepo;
+        this.mapper = mapper;
     }
 
     @Override
     @Transactional
-    public Participante create(String nombre, String apellido, String tipoDocumento, String numeroDocumento, String email, Long userId) {
-        if (repo.findByDocumento_TipoAndDocumento_Numero(tipoDocumento, numeroDocumento).isPresent())
-            throw new RuntimeException("Documento ya registrado");
+    public ParticipanteResponseDTO create(CreateParticipanteDTO dto) {
+        require(() -> userRepo.findById(dto.getUserId()).orElse(null), "User no encontrado");
 
-        var user = require(() -> userRepo.findById(userId).orElse(null), "User no encontrado");
+        check(!repo.existsByUserAccount_Id(dto.getUserId()), "El usuario ya está asociado a un participante");
 
-        Participante p = new Participante();
-        p.setNombre(nombre);
-        p.setApellido(apellido);
-        p.setDocumento(new Documento(Enum.valueOf(com.poo.proyecto.entity.TipoDocumento.class, tipoDocumento), numeroDocumento));
-        p.setEmail(new Email(email));
-        p.setUserAccount(user);
-        return repo.save(p);
+        check(!repo.existsByDocumento_TipoAndDocumento_Numero(dto.getDocumento().getTipo(), dto.getDocumento().getNumero()),
+                "Ya existe un participante con ese documento");
+
+        check(!repo.existsByEmail_Value(dto.getEmail().getValue()), "Ya existe un participante con ese email");
+
+        Participante p = mapper.toEntity(dto);
+
+        return mapper.toResponse(repo.save(p));
     }
 
     @Override
     @Transactional
-    public Participante update(Long id, String nombre, String apellido, String email) {
+    public ParticipanteResponseDTO update(Long id, UpdateParticipanteDTO dto) {
         Participante p = orNotFound(repo.findById(id), "Participante no encontrado");
-        p.setNombre(nombre);
-        p.setApellido(apellido);
-        p.setEmail(new Email(email));
-        return p;
+
+        if (dto.getDocumento().getTipo() != null || dto.getDocumento().getNumero() != null) {
+            check(!repo.existsByDocumento_TipoAndDocumento_Numero(dto.getDocumento().getTipo(), dto.getDocumento().getNumero()),
+                    "Ya existe un participante con ese documento");
+        }
+        if (dto.getEmail().getValue() != null) {
+            check(!repo.existsByEmail_Value(dto.getEmail().getValue()), "Ya existe un participante con ese email");
+        }
+
+        mapper.updateEntity(dto, p);
+
+        return mapper.toResponse(p);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Participante get(Long id) {
-        return orNotFound(repo.findById(id), "Participante no encontrado");
+    public ParticipanteResponseDTO get(Long id) {
+        Participante p = orNotFound(repo.findById(id), "Participante no encontrado");
+
+        return mapper.toResponse(p);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Participante> list(Pageable pageable) {
-        return repo.findAll(pageable);
+    public Page<ParticipanteResponseDTO> list(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toResponse);
     }
 }

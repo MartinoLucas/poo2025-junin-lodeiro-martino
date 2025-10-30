@@ -1,6 +1,10 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.role.CreateRoleDTO;
+import com.poo.proyecto.dto.role.RoleResponseDTO;
+import com.poo.proyecto.dto.role.UpdateRoleDTO;
 import com.poo.proyecto.entity.Role;
+import com.poo.proyecto.mapper.RoleMapper;
 import com.poo.proyecto.repository.RoleRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,43 +15,46 @@ import org.springframework.transaction.annotation.Transactional;
 public class RoleServiceImpl extends BaseServiceSupport implements RoleService {
 
     private final RoleRepository repo;
+    private final RoleMapper mapper;
 
-    public RoleServiceImpl(RoleRepository repo) {
+    public RoleServiceImpl(RoleRepository repo, RoleMapper mapper) {
         this.repo = repo;
+        this.mapper = mapper;
     }
 
     @Override
     @Transactional
-    public Role create(String name, String description) {
-        check(!repo.existsByNameIgnoreCase(name), "Ya existe un role con ese nombre");
-        Role r = new Role();
-        r.setName(name);
-        r.setDescription(description);
-        return repo.save(r);
+    public RoleResponseDTO create(CreateRoleDTO dto) {
+        check(!repo.existsByNameIgnoreCase(dto.getName()), "Ya existe un role con ese nombre");
+
+        Role r = mapper.toEntity(dto);
+        return mapper.toResponse(repo.save(r));
     }
 
     @Override
     @Transactional
-    public Role update(Long id, String name, String description) {
+    public RoleResponseDTO update(Long id, UpdateRoleDTO dto) {
         Role r = orNotFound(repo.findById(id), "Role no encontrado");
+
         // si cambia el nombre, validar unicidad
-        check(r.getName().equalsIgnoreCase(name) || !repo.existsByNameIgnoreCase(name),
+        check(r.getName().equalsIgnoreCase(dto.getName()) || !repo.existsByNameIgnoreCase(dto.getName()),
                 "Nombre de role ya en uso");
-        r.setName(name);
-        r.setDescription(description);
-        return r;
+
+        mapper.updateEntity(dto, r);
+        return mapper.toResponse(r);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Role get(Long id) {
-        return orNotFound(repo.findById(id), "Role no encontrado");
+    public RoleResponseDTO get(Long id) {
+        Role r = orNotFound(repo.findById(id), "Role no encontrado");
+        return mapper.toResponse(r);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<Role> list(Pageable pageable) {
-        return repo.findAll(pageable);
+    public Page<RoleResponseDTO> list(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toResponse);
     }
 
     @Override

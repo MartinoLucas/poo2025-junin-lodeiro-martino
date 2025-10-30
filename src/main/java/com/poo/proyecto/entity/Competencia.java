@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "competencia",
+        uniqueConstraints = @UniqueConstraint(name = "uk_competencia_torneo_nombre", columnNames = {"torneo_id", "nombre"}),
         indexes = @Index(name = "ix_competencia_torneo", columnList = "torneo_id"))
 public class Competencia extends Auditable {
 
