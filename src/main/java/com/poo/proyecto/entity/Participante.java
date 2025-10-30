@@ -8,7 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 @Table(name = "participant_profile",
         uniqueConstraints = {
                 @UniqueConstraint(name = "uk_participant_doc", columnNames = {"tipo_documento", "numero_documento"}),
-                @UniqueConstraint(name = "uk_participant_user", columnNames = {"user_id"})
+                @UniqueConstraint(name = "uk_participant_user", columnNames = {"user_id"}),
+                @UniqueConstraint(name = "uk_participant_email", columnNames = {"email"})
         },
         indexes = {
                 @Index(name = "ix_participant_email", columnList = "email")

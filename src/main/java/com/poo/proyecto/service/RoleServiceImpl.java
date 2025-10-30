@@ -26,6 +26,7 @@ public class RoleServiceImpl extends BaseServiceSupport implements RoleService {
     @Transactional
     public RoleResponseDTO create(CreateRoleDTO dto) {
         check(!repo.existsByNameIgnoreCase(dto.getName()), "Ya existe un role con ese nombre");
+
         Role r = mapper.toEntity(dto);
         return mapper.toResponse(repo.save(r));
     }
@@ -34,9 +35,11 @@ public class RoleServiceImpl extends BaseServiceSupport implements RoleService {
     @Transactional
     public RoleResponseDTO update(Long id, UpdateRoleDTO dto) {
         Role r = orNotFound(repo.findById(id), "Role no encontrado");
+
         // si cambia el nombre, validar unicidad
         check(r.getName().equalsIgnoreCase(dto.getName()) || !repo.existsByNameIgnoreCase(dto.getName()),
                 "Nombre de role ya en uso");
+
         mapper.updateEntity(dto, r);
         return mapper.toResponse(r);
     }

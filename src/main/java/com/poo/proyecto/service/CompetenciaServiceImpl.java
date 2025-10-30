@@ -53,8 +53,21 @@ public class CompetenciaServiceImpl extends BaseServiceSupport implements Compet
         check(c.getTorneo().getEstado() == TorneoStatus.BORRADOR,
                 "Solo se pueden editar competencias en torneos en BORRADOR");
 
-        check(!repo.existsByTorneo_IdAndNombreIgnoreCase(c.getTorneo().getId(), dto.getNombre()),
-                "Nombre de competencia ya en uso en este torneo");
+        if (dto.getNombre() != null) {
+            check(!repo.existsByTorneo_IdAndNombreIgnoreCase(c.getTorneo().getId(), dto.getNombre()),
+                    "Nombre de competencia ya en uso en este torneo");
+        }
+
+        if (dto.getTorneoId() != null) {
+            Torneo newTorneo = orNotFound(torneoRepo.findById(dto.getTorneoId()), "Torneo no encontrado");
+
+            check(newTorneo.getEstado() == TorneoStatus.BORRADOR,
+                    "Solo se pueden asociar competencias a torneos en BORRADOR");
+
+            check(!repo.existsByTorneo_IdAndNombreIgnoreCase(dto.getTorneoId(),
+                    dto.getNombre() != null ? dto.getNombre() : c.getNombre()),
+                    "Ya existe una competencia con ese nombre en el nuevo torneo");
+        }
 
         mapper.updateEntity(dto, c);
 

@@ -12,5 +12,11 @@ public interface ParticipanteRepository extends JpaRepository<Participante, Long
 
     // Buscar participante por user account
     Optional<Participante> findByUserAccount_Id(Long userId);
+
+    boolean existsByUserAccount_Id(Long userId);
+
+    boolean existsByDocumento_TipoAndDocumento_Numero(TipoDocumento tipo, String numero);
+
+    boolean existsByEmail_Value(String email);
 }
 

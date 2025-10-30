@@ -33,18 +33,29 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     @Override @Transactional
     public TorneoResponseDTO create(CreateTorneoDTO dto) {
         check(!dto.getFechaFin().isBefore(dto.getFechaInicio()), "La fecha fin no puede ser anterior al inicio");
+
         check(!repo.existsByNombreIgnoreCase(dto.getNombre()), "Ya existe un torneo con ese nombre");
 
         Torneo t = mapper.toEntity(dto);
+
         repo.save(t);
+
         return mapper.toResponse(t);
     }
 
     @Override @Transactional
     public TorneoResponseDTO update(Long id, UpdateTorneoDTO dto) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
+
         check(t.puedeEditar(), "El torneo no permite edición en este estado");
-        check(!dto.getFechaFin().isBefore(dto.getFechaInicio()), "La fecha fin no puede ser anterior al inicio");
+
+        if (dto.getNombre() != null && !dto.getNombre().equalsIgnoreCase(t.getNombre())) {
+            check(!repo.existsByNombreIgnoreCase(dto.getNombre()), "Ya existe un torneo con ese nombre");
+        }
+
+        if (dto.getFechaFin() != null && dto.getFechaInicio() != null) {
+            check(!dto.getFechaFin().isBefore(dto.getFechaInicio()), "La fecha fin no puede ser anterior al inicio");
+        }
 
         mapper.updateEntity(dto, t);
         return mapper.toResponse(t);
@@ -53,24 +64,31 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     @Override @Transactional
     public TorneoResponseDTO publish(Long id) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
+
         check(t.getEstado() == TorneoStatus.BORRADOR, "Solo un borrador puede publicarse");
+
         t.setEstado(TorneoStatus.PUBLICADO);
+
         return mapper.toResponse(t);
     }
 
     @Override @Transactional
     public TorneoResponseDTO finalizeTournament(Long id) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
+
         check(t.getEstado() == TorneoStatus.PUBLICADO, "Solo un torneo publicado puede finalizarse");
-        check(t.getEstado() == TorneoStatus.FINALIZADO, "El torneo ya está finalizado");
+
         t.setEstado(TorneoStatus.FINALIZADO);
+
         return mapper.toResponse(t);
     }
 
     @Override @Transactional
     public void deleteDraft(Long id) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
+
         check(t.getEstado() == TorneoStatus.BORRADOR, "Solo se puede eliminar un torneo en borrador");
+
         repo.delete(t);
     }
 

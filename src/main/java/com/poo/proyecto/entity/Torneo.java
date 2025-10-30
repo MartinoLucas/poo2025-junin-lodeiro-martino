@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "torneo",
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_torneo_nombre", columnNames = {"nombre"})
+        },
         indexes = {
                 @Index(name = "ix_torneo_estado", columnList = "estado"),
                 @Index(name = "ix_torneo_fechas", columnList = "fecha_inicio, fecha_fin")

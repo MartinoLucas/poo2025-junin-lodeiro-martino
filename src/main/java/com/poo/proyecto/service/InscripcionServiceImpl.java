@@ -41,6 +41,8 @@ public class InscripcionServiceImpl extends BaseServiceSupport implements Inscri
         check(c.hayCupo(), "No hay cupo disponible");
         check(repo.findByParticipante_IdAndCompetencia_Id(dto.getParticipanteId(), dto.getCompetenciaId()).isPresent(),
                 "Participante ya inscrito en esta competencia");
+        check(dto.getPrecioPagado()!=null, "Precio Pagado no puede ser nulo");
+        check(dto.getFechaInscripcion()!=null, "Fecha Inscripcion no puede ser nulo");
 
         c.incrementarInscriptos();
 

@@ -32,10 +32,14 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
     @Override
     @Transactional
     public ParticipanteResponseDTO create(CreateParticipanteDTO dto) {
-        check(repo.findByDocumento_TipoAndDocumento_Numero(dto.getDocumento().getTipo(), dto.getDocumento().getNumero()).isEmpty(),
+        require(() -> userRepo.findById(dto.getUserId()).orElse(null), "User no encontrado");
+
+        check(!repo.existsByUserAccount_Id(dto.getUserId()), "El usuario ya está asociado a un participante");
+
+        check(!repo.existsByDocumento_TipoAndDocumento_Numero(dto.getDocumento().getTipo(), dto.getDocumento().getNumero()),
                 "Ya existe un participante con ese documento");
 
-        UserAccount user = require(() -> userRepo.findById(dto.getUserId()).orElse(null), "User no encontrado");
+        check(!repo.existsByEmail_Value(dto.getEmail().getValue()), "Ya existe un participante con ese email");
 
         Participante p = mapper.toEntity(dto);
 
@@ -46,7 +50,17 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
     @Transactional
     public ParticipanteResponseDTO update(Long id, UpdateParticipanteDTO dto) {
         Participante p = orNotFound(repo.findById(id), "Participante no encontrado");
+
+        if (dto.getDocumento().getTipo() != null || dto.getDocumento().getNumero() != null) {
+            check(!repo.existsByDocumento_TipoAndDocumento_Numero(dto.getDocumento().getTipo(), dto.getDocumento().getNumero()),
+                    "Ya existe un participante con ese documento");
+        }
+        if (dto.getEmail().getValue() != null) {
+            check(!repo.existsByEmail_Value(dto.getEmail().getValue()), "Ya existe un participante con ese email");
+        }
+
         mapper.updateEntity(dto, p);
+
         return mapper.toResponse(p);
     }
 

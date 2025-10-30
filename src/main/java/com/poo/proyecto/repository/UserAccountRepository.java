@@ -16,6 +16,11 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     boolean existsByEmail_Value(String email);
 
     /**
+     * Verifica si ya existe una cuenta con el email indicado y que no esté marcada como eliminada (deletedAt is null).
+     */
+    boolean existsByEmailValueAndDeletedAtIsNull(String email);
+
+    /**
      * Busca una cuenta de usuario por su email (case-insensitive).
      */
     Optional<UserAccount> findByEmail_ValueIgnoreCase(String email);
