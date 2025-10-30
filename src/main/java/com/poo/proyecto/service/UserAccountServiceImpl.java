@@ -1,7 +1,13 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.user.CreateUserDTO;
+import com.poo.proyecto.dto.user.UpdateUserDTO;
+import com.poo.proyecto.dto.user.UserResponseDTO;
 import com.poo.proyecto.entity.UserAccount;
 import com.poo.proyecto.entity.base.Email;
+import com.poo.proyecto.mapper.ParticipanteMapper;
+import com.poo.proyecto.mapper.UserAccountMapper;
+import com.poo.proyecto.mapper.common.EmailMapper;
 import com.poo.proyecto.repository.UserAccountRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,36 +20,45 @@ import com.poo.proyecto.util.PasswordEncoder;
 public class UserAccountServiceImpl extends BaseServiceSupport implements UserAccountService {
 
     private final UserAccountRepository repo;
-    private final PasswordEncoder passwordEncoder;
+    private final UserAccountMapper userMapper;
+    private final EmailMapper emailMapper;
 
-    public UserAccountServiceImpl(UserAccountRepository repo,PasswordEncoder passwordEncoder) {
+    private final PasswordEncoder passwordEncoder;
+    private final ParticipanteMapper participanteMapper;
+
+    public UserAccountServiceImpl(UserAccountRepository repo, UserAccountMapper userMapper, EmailMapper emailMapper, PasswordEncoder passwordEncoder, ParticipanteMapper participanteMapper) {
         this.repo = repo;
+        this.userMapper = userMapper;
+        this.emailMapper = emailMapper;
         this.passwordEncoder = passwordEncoder;
+        this.participanteMapper = participanteMapper;
     }
 
     @Override
     @Transactional
-    public UserAccount create(com.poo.proyecto.entity.base.Email email, String passwordHash) {
-        check(!repo.existsByEmail_Value(email.value()), "Ya existe una cuenta con ese email");
-        UserAccount u = new UserAccount();
-        u.setEmail(email);
+    public UserResponseDTO create(CreateUserDTO dto) {
+        check(!repo.existsByEmail_Value(dto.getEmail().getValue()), "Ya existe una cuenta con ese email");
+        UserAccount u = userMapper.toEntity(dto);
+        u.setEmail(emailMapper.toEntity(dto.getEmail()));
         // encode la contraseña antes de guardarla
-        u.setPasswordHash(passwordEncoder.encode(passwordHash));
-        return repo.save(u);
+        u.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
+        u = repo.save(u);
+        return userMapper.toResponse(u);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserAccount get(Long id) {
-        return orNotFound(repo.findById(id), "UserAccount no encontrado");
+    public UserResponseDTO get(Long id) {
+        UserAccount u = orNotFound(repo.findById(id), "UserAccount no encontrado");
+        return userMapper.toResponse(u);
     }
 
     @Override
     @Transactional
-    public UserAccount updatePassword(Long id, String newPasswordHash) {
+    public UserResponseDTO update(Long id, UpdateUserDTO dto) {
         UserAccount u = orNotFound(repo.findById(id), "UserAccount no encontrado");
-        u.setPasswordHash(passwordEncoder.encode(newPasswordHash));
-        return u;
+        userMapper.updateEntity(dto,u);
+        return userMapper.toResponse(u);
     }
 
     @Override
@@ -62,7 +77,8 @@ public class UserAccountServiceImpl extends BaseServiceSupport implements UserAc
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserAccount> list(Pageable pageable) {
-        return repo.findAll(pageable);
+    public Page<UserResponseDTO> list(Pageable pageable) {
+
+        return repo.findAll(pageable).map(userMapper::toResponse);
     }
 }
