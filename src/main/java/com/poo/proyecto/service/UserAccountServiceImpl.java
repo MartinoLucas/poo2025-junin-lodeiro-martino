@@ -8,23 +8,27 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import com.poo.proyecto.util.PasswordEncoder;
 
 @Service
 public class UserAccountServiceImpl extends BaseServiceSupport implements UserAccountService {
 
     private final UserAccountRepository repo;
+    private final PasswordEncoder passwordEncoder;
 
-    public UserAccountServiceImpl(UserAccountRepository repo) {
+    public UserAccountServiceImpl(UserAccountRepository repo,PasswordEncoder passwordEncoder) {
         this.repo = repo;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     @Transactional
-    public UserAccount create(Email email, String passwordHash) {
+    public UserAccount create(com.poo.proyecto.entity.base.Email email, String passwordHash) {
         check(!repo.existsByEmail_Value(email.value()), "Ya existe una cuenta con ese email");
         UserAccount u = new UserAccount();
         u.setEmail(email);
-        u.setPasswordHash(passwordHash);
+        // encode la contraseña antes de guardarla
+        u.setPasswordHash(passwordEncoder.encode(passwordHash));
         return repo.save(u);
     }
 
@@ -38,7 +42,7 @@ public class UserAccountServiceImpl extends BaseServiceSupport implements UserAc
     @Transactional
     public UserAccount updatePassword(Long id, String newPasswordHash) {
         UserAccount u = orNotFound(repo.findById(id), "UserAccount no encontrado");
-        u.setPasswordHash(newPasswordHash);
+        u.setPasswordHash(passwordEncoder.encode(newPasswordHash));
         return u;
     }
 
