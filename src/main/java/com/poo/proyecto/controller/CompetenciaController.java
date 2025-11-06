@@ -25,7 +25,7 @@ public class CompetenciaController {
         return ResponseEntity.status(201).body(service.create(dto));
     }
 
-    @GetMapping("/{torneoId}")
+    @GetMapping("/torneo/{torneoId}")
     public ResponseEntity<Page<CompetenciaResponseDTO>> list(@PathVariable Long torneoId, Pageable pageable) {
         return ResponseEntity.ok(service.listByTorneo(torneoId,pageable));
     }

@@ -2,6 +2,7 @@ package com.poo.proyecto.entity;
 
 import com.poo.proyecto.entity.base.*;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -30,7 +31,7 @@ public class Competencia extends Auditable {
             @AttributeOverride(name = "amount", column = @Column(name = "precio_base", precision = 12, scale = 2, nullable = false)),
             @AttributeOverride(name = "currency", column = @Column(name = "precio_base_currency", length = 3, nullable = false))
     })
-    @DecimalMin("0.00")
+    @Valid
     private Money precioBase;
 
     @Min(1)

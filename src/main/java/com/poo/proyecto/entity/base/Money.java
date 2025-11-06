@@ -1,6 +1,8 @@
 package com.poo.proyecto.entity.base;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.DecimalMin;
+
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -8,6 +10,7 @@ import java.util.Objects;
 public class Money {
 
     @Column(name = "amount", precision = 12, scale = 2, nullable = false)
+    @DecimalMin("0.00")
     private BigDecimal amount;
 
     @Column(name = "currency", length = 3, nullable = false)
