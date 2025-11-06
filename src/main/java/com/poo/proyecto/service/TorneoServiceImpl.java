@@ -65,9 +65,8 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     public TorneoResponseDTO publish(Long id) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
 
-        check(t.getEstado() == TorneoStatus.BORRADOR, "Solo un borrador puede publicarse");
-
-        t.setEstado(TorneoStatus.PUBLICADO);
+        // aplicamos el patron state
+        t.publicar();
 
         return mapper.toResponse(t);
     }
@@ -76,9 +75,8 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     public TorneoResponseDTO finalizeTournament(Long id) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
 
-        check(t.getEstado() == TorneoStatus.PUBLICADO, "Solo un torneo publicado puede finalizarse");
-
-        t.setEstado(TorneoStatus.FINALIZADO);
+        //aplicamos el patron state
+        t.finalizar();
 
         return mapper.toResponse(t);
     }
@@ -87,7 +85,7 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     public void deleteDraft(Long id) {
         Torneo t = orNotFound(repo.findById(id), "Torneo no encontrado");
 
-        check(t.getEstado() == TorneoStatus.BORRADOR, "Solo se puede eliminar un torneo en borrador");
+        t.eliminar();
 
         repo.delete(t);
     }

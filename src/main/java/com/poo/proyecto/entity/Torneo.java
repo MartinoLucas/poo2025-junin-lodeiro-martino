@@ -81,4 +81,22 @@ public class Torneo extends Auditable {
     public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
     public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
     public void setEstado(TorneoStatus estado) { this.estado = estado; this.runtimeState = TorneoStateFactory.from(estado); }
+
+    public void publicar() {
+        ensureState();
+        runtimeState.publicar(this);
+    }
+
+    public void finalizar() {
+        ensureState();
+        runtimeState.finalizar(this);
+    }
+
+    public void eliminar() {
+        ensureState();
+        if (!runtimeState.puedeEliminar(this)) {
+            throw new IllegalStateException("No se puede eliminar el torneo en este estado");
+        }
+    }
+
 }

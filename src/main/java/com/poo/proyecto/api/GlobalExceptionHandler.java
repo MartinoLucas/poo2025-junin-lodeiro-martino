@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -29,14 +30,25 @@ public class GlobalExceptionHandler {
     public ApiError handleValidation(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String detail = ex.getBindingResult().getFieldErrors().stream()
                 .map(err -> err.getField() + ": " + err.getDefaultMessage())
-                .findFirst()
-                .orElse("Datos inválidos");
+                .collect(Collectors.joining("; "));
 
         return new ApiError(
                 "invalid_payload",
                 "Datos inválidos enviados",
                 400,
                 detail,
+                request.getRequestURI()
+        );
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleIllegalState(IllegalStateException ex, HttpServletRequest request) {
+        return new ApiError(
+                "invalid_state",
+                "Operación inválida en el estado actual",
+                409,
+                ex.getMessage(),
                 request.getRequestURI()
         );
     }
