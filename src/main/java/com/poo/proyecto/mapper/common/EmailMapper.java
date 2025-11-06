@@ -6,6 +6,13 @@ import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
 public interface EmailMapper {
-    EmailDTO toDto(Email email);
-    Email toEntity(EmailDTO dto);
+    default EmailDTO toDto(Email email) {
+        if (email == null) return null;
+        return new EmailDTO(email.value());
+    }
+
+    default Email toEntity(EmailDTO dto) {
+        if (dto == null) return null;
+        return new Email(dto.getValue());
+    }
 }

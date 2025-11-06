@@ -11,6 +11,7 @@ import org.mapstruct.*;
 @Mapper(componentModel = "spring", uses = { DocumentoMapper.class, EmailMapper.class })
 public interface ParticipanteMapper {
 
+    @Mapping(target = "userAccount", ignore = true)
     Participante toEntity(CreateParticipanteDTO dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -18,4 +19,20 @@ public interface ParticipanteMapper {
 
     @Mapping(source = "userAccount.id", target = "userId")
     ParticipanteResponseDTO toResponse(Participante entity);
+
+    // 👇 Este método se ejecuta después del mapeo
+    @AfterMapping
+    default void linkUser(CreateParticipanteDTO dto, @MappingTarget Participante entity) {
+        if (dto.getUserId() != null) {
+            var user = new com.poo.proyecto.entity.UserAccount();
+            try {
+                java.lang.reflect.Field idField = user.getClass().getDeclaredField("id");
+                idField.setAccessible(true);
+                idField.set(user, dto.getUserId());
+            } catch (Exception e) {
+                throw new RuntimeException("Error setting UserAccount ID manually", e);
+            }
+            entity.setUserAccount(user);
+        }
+    }
 }
