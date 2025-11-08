@@ -4,7 +4,6 @@ import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
 import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
 import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
 import com.poo.proyecto.entity.Competencia;
-import com.poo.proyecto.entity.Torneo;
 import com.poo.proyecto.mapper.common.MoneyMapper;
 import javax.annotation.processing.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +11,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-06T12:05:11-0300",
+    date = "2025-11-08T10:26:29-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Microsoft)"
 )
 @Component
@@ -20,6 +19,8 @@ public class CompetenciaMapperImpl implements CompetenciaMapper {
 
     @Autowired
     private MoneyMapper moneyMapper;
+    @Autowired
+    private TorneoMapper torneoMapper;
 
     @Override
     public Competencia toEntity(CreateCompetenciaDTO dto) {
@@ -61,7 +62,7 @@ public class CompetenciaMapperImpl implements CompetenciaMapper {
 
         CompetenciaResponseDTO competenciaResponseDTO = new CompetenciaResponseDTO();
 
-        competenciaResponseDTO.setTorneoId( entityTorneoId( entity ) );
+        competenciaResponseDTO.setTorneo( torneoMapper.toResponse( entity.getTorneo() ) );
         competenciaResponseDTO.setId( entity.getId() );
         competenciaResponseDTO.setNombre( entity.getNombre() );
         competenciaResponseDTO.setPrecioBase( moneyMapper.toDto( entity.getPrecioBase() ) );
@@ -71,20 +72,5 @@ public class CompetenciaMapperImpl implements CompetenciaMapper {
         competenciaResponseDTO.setUpdatedAt( entity.getUpdatedAt() );
 
         return competenciaResponseDTO;
-    }
-
-    private Long entityTorneoId(Competencia competencia) {
-        if ( competencia == null ) {
-            return null;
-        }
-        Torneo torneo = competencia.getTorneo();
-        if ( torneo == null ) {
-            return null;
-        }
-        Long id = torneo.getId();
-        if ( id == null ) {
-            return null;
-        }
-        return id;
     }
 }

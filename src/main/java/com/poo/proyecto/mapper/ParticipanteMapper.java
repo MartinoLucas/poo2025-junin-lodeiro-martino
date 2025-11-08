@@ -17,22 +17,6 @@ public interface ParticipanteMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(UpdateParticipanteDTO dto, @MappingTarget Participante entity);
 
-    @Mapping(source = "userAccount.id", target = "userId")
+    @Mapping(source = "userAccount", target = "user")
     ParticipanteResponseDTO toResponse(Participante entity);
-
-    // 👇 Este método se ejecuta después del mapeo
-    @AfterMapping
-    default void linkUser(CreateParticipanteDTO dto, @MappingTarget Participante entity) {
-        if (dto.getUserId() != null) {
-            var user = new com.poo.proyecto.entity.UserAccount();
-            try {
-                java.lang.reflect.Field idField = user.getClass().getDeclaredField("id");
-                idField.setAccessible(true);
-                idField.set(user, dto.getUserId());
-            } catch (Exception e) {
-                throw new RuntimeException("Error setting UserAccount ID manually", e);
-            }
-            entity.setUserAccount(user);
-        }
-    }
 }

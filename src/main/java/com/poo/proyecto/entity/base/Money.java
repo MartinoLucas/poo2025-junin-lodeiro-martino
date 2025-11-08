@@ -24,8 +24,8 @@ public class Money {
 
     public static Money of(BigDecimal amount) { return new Money(amount); }
 
-    public BigDecimal amount() { return amount; }
-    public String currency() { return currency; }
+    public BigDecimal getAmount() { return amount; }
+    public String getCurrency() { return currency; }
 
     // helpers de dominio (no rompen el “solo models”)
     public Money add(Money other) { return new Money(this.amount.add(other.amount)); }

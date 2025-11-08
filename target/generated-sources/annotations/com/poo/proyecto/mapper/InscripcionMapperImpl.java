@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-06T12:05:06-0300",
+    date = "2025-11-08T10:26:29-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Microsoft)"
 )
 @Component
@@ -18,6 +18,10 @@ public class InscripcionMapperImpl implements InscripcionMapper {
 
     @Autowired
     private MoneyMapper moneyMapper;
+    @Autowired
+    private ParticipanteMapper participanteMapper;
+    @Autowired
+    private CompetenciaMapper competenciaMapper;
 
     @Override
     public Inscripcion toEntity(CreateInscripcionDTO dto) {
@@ -41,6 +45,8 @@ public class InscripcionMapperImpl implements InscripcionMapper {
 
         InscripcionResponseDTO inscripcionResponseDTO = new InscripcionResponseDTO();
 
+        inscripcionResponseDTO.setParticipante( participanteMapper.toResponse( entity.getParticipante() ) );
+        inscripcionResponseDTO.setCompetencia( competenciaMapper.toResponse( entity.getCompetencia() ) );
         inscripcionResponseDTO.setId( entity.getId() );
         inscripcionResponseDTO.setPrecioPagado( moneyMapper.toDto( entity.getPrecioPagado() ) );
         inscripcionResponseDTO.setFechaInscripcion( entity.getFechaInscripcion() );

@@ -19,6 +19,6 @@ public class Documento {
         this.numero = numero;
     }
 
-    public TipoDocumento tipo() { return tipo; }
-    public String numero() { return numero; }
+    public TipoDocumento getTipo() { return tipo; }
+    public String getNumero() { return numero; }
 }

@@ -3,17 +3,22 @@ package com.poo.proyecto.mapper;
 import com.poo.proyecto.dto.participante.CreateParticipanteDTO;
 import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.participante.UpdateParticipanteDTO;
+import com.poo.proyecto.dto.role.RoleResponseDTO;
+import com.poo.proyecto.dto.user.UserResponseDTO;
 import com.poo.proyecto.entity.Participante;
+import com.poo.proyecto.entity.Role;
 import com.poo.proyecto.entity.UserAccount;
 import com.poo.proyecto.mapper.common.DocumentoMapper;
 import com.poo.proyecto.mapper.common.EmailMapper;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import javax.annotation.processing.Generated;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-06T12:05:06-0300",
+    date = "2025-11-08T10:26:29-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Microsoft)"
 )
 @Component
@@ -36,8 +41,6 @@ public class ParticipanteMapperImpl implements ParticipanteMapper {
         participante.setApellido( dto.getApellido() );
         participante.setDocumento( documentoMapper.toEntity( dto.getDocumento() ) );
         participante.setEmail( emailMapper.toEntity( dto.getEmail() ) );
-
-        linkUser( dto, participante );
 
         return participante;
     }
@@ -70,7 +73,7 @@ public class ParticipanteMapperImpl implements ParticipanteMapper {
 
         ParticipanteResponseDTO participanteResponseDTO = new ParticipanteResponseDTO();
 
-        participanteResponseDTO.setUserId( entityUserAccountId( entity ) );
+        participanteResponseDTO.setUser( userAccountToUserResponseDTO( entity.getUserAccount() ) );
         participanteResponseDTO.setId( entity.getId() );
         participanteResponseDTO.setNombre( entity.getNombre() );
         participanteResponseDTO.setApellido( entity.getApellido() );
@@ -80,18 +83,46 @@ public class ParticipanteMapperImpl implements ParticipanteMapper {
         return participanteResponseDTO;
     }
 
-    private Long entityUserAccountId(Participante participante) {
-        if ( participante == null ) {
+    protected RoleResponseDTO roleToRoleResponseDTO(Role role) {
+        if ( role == null ) {
             return null;
         }
-        UserAccount userAccount = participante.getUserAccount();
+
+        RoleResponseDTO roleResponseDTO = new RoleResponseDTO();
+
+        roleResponseDTO.setId( role.getId() );
+        roleResponseDTO.setName( role.getName() );
+        roleResponseDTO.setDescription( role.getDescription() );
+
+        return roleResponseDTO;
+    }
+
+    protected Set<RoleResponseDTO> roleSetToRoleResponseDTOSet(Set<Role> set) {
+        if ( set == null ) {
+            return null;
+        }
+
+        Set<RoleResponseDTO> set1 = new LinkedHashSet<RoleResponseDTO>( Math.max( (int) ( set.size() / .75f ) + 1, 16 ) );
+        for ( Role role : set ) {
+            set1.add( roleToRoleResponseDTO( role ) );
+        }
+
+        return set1;
+    }
+
+    protected UserResponseDTO userAccountToUserResponseDTO(UserAccount userAccount) {
         if ( userAccount == null ) {
             return null;
         }
-        Long id = userAccount.getId();
-        if ( id == null ) {
-            return null;
-        }
-        return id;
+
+        UserResponseDTO userResponseDTO = new UserResponseDTO();
+
+        userResponseDTO.setId( userAccount.getId() );
+        userResponseDTO.setEmail( emailMapper.toDto( userAccount.getEmail() ) );
+        userResponseDTO.setRoles( roleSetToRoleResponseDTOSet( userAccount.getRoles() ) );
+        userResponseDTO.setCreatedAt( userAccount.getCreatedAt() );
+        userResponseDTO.setUpdatedAt( userAccount.getUpdatedAt() );
+
+        return userResponseDTO;
     }
 }

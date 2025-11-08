@@ -1,12 +1,15 @@
 package com.poo.proyecto.dto.inscripcion;
 
 import com.poo.proyecto.dto.common.MoneyDTO;
+import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
+import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
+
 import java.time.LocalDateTime;
 
 public class InscripcionResponseDTO {
     private Long id;
-    private Long participanteId;
-    private Long competenciaId;
+    private ParticipanteResponseDTO participante;
+    private CompetenciaResponseDTO competencia;
     private MoneyDTO precioPagado;
     private LocalDateTime fechaInscripcion;
 
@@ -20,20 +23,20 @@ public class InscripcionResponseDTO {
         this.id = id;
     }
 
-    public Long getParticipanteId() {
-        return participanteId;
+    public ParticipanteResponseDTO getParticipante() {
+        return participante;
     }
 
-    public void setParticipanteId(Long participanteId) {
-        this.participanteId = participanteId;
+    public void setParticipante(ParticipanteResponseDTO participante) {
+        this.participante = participante;
     }
 
-    public Long getCompetenciaId() {
-        return competenciaId;
+    public CompetenciaResponseDTO getCompetencia() {
+        return competencia;
     }
 
-    public void setCompetenciaId(Long competenciaId) {
-        this.competenciaId = competenciaId;
+    public void setCompetencia(CompetenciaResponseDTO competencia) {
+        this.competencia = competencia;
     }
 
     public MoneyDTO getPrecioPagado() {

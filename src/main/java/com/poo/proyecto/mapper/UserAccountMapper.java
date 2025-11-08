@@ -16,5 +16,6 @@ public interface UserAccountMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(UpdateUserDTO dto, @MappingTarget UserAccount entity);
 
+    @Mapping(source = "roles", target = "roles")
     UserResponseDTO toResponse(UserAccount entity);
 }

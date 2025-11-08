@@ -8,7 +8,7 @@ import com.poo.proyecto.entity.Torneo;
 import com.poo.proyecto.mapper.common.MoneyMapper;
 import org.mapstruct.*;
 
-@Mapper(componentModel = "spring", uses = { MoneyMapper.class })
+@Mapper(componentModel = "spring", uses = { MoneyMapper.class, TorneoMapper.class })
 public interface CompetenciaMapper {
 
     Competencia toEntity(CreateCompetenciaDTO dto);
@@ -28,10 +28,9 @@ public interface CompetenciaMapper {
         }
     }
 
-
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateEntity(UpdateCompetenciaDTO dto, @MappingTarget Competencia entity);
 
-    @Mapping(source = "torneo.id", target = "torneoId")
+    @Mapping(source = "torneo", target = "torneo")
     CompetenciaResponseDTO toResponse(Competencia entity);
 }

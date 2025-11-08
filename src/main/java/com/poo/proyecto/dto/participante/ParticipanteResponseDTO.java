@@ -2,10 +2,11 @@ package com.poo.proyecto.dto.participante;
 
 import com.poo.proyecto.dto.common.DocumentoDTO;
 import com.poo.proyecto.dto.common.EmailDTO;
+import com.poo.proyecto.dto.user.UserResponseDTO;
 
 public class ParticipanteResponseDTO {
     private Long id;
-    private Long userId;
+    private UserResponseDTO user;
     private String nombre;
     private String apellido;
     private DocumentoDTO documento;
@@ -14,8 +15,13 @@ public class ParticipanteResponseDTO {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+    public UserResponseDTO getUser() {
+        return user;
+    }
+
+    public void setUser(UserResponseDTO user) {
+        this.user = user;
+    }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }

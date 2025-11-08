@@ -1,6 +1,8 @@
 package com.poo.proyecto.dto.competencia;
 
 import com.poo.proyecto.dto.common.MoneyDTO;
+import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
+
 import java.time.LocalDateTime;
 
 public class CompetenciaResponseDTO {
@@ -9,7 +11,7 @@ public class CompetenciaResponseDTO {
     private MoneyDTO precioBase;
     private int cupo;
     private int inscriptosActuales;
-    private Long torneoId;
+    private TorneoResponseDTO torneo;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -55,12 +57,12 @@ public class CompetenciaResponseDTO {
         this.inscriptosActuales = inscriptosActuales;
     }
 
-    public Long getTorneoId() {
-        return torneoId;
+    public TorneoResponseDTO getTorneo() {
+        return torneo;
     }
 
-    public void setTorneoId(Long torneoId) {
-        this.torneoId = torneoId;
+    public void setTorneo(TorneoResponseDTO torneo) {
+        this.torneo = torneo;
     }
 
     public LocalDateTime getCreatedAt() {

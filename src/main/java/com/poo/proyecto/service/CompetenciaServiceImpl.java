@@ -48,7 +48,7 @@ public class CompetenciaServiceImpl extends BaseServiceSupport implements Compet
     @Override
     @Transactional
     public CompetenciaResponseDTO update(Long id, UpdateCompetenciaDTO dto) {
-        Competencia c = orNotFound(repo.findByIdWithTorneo(id), "Competencia no encontrada");
+        Competencia c = orNotFound(repo.findWithTorneoById(id), "Competencia no encontrada");
 
         check(c.getTorneo().getEstado() == TorneoStatus.BORRADOR,
                 "Solo se pueden editar competencias en torneos en BORRADOR");
@@ -77,7 +77,7 @@ public class CompetenciaServiceImpl extends BaseServiceSupport implements Compet
     @Override
     @Transactional
     public void delete(Long id) {
-        Competencia c = orNotFound(repo.findByIdWithTorneo(id), "Competencia no encontrada");
+        Competencia c = orNotFound(repo.findWithTorneoById(id), "Competencia no encontrada");
 
         check(c.getTorneo().getEstado() == TorneoStatus.BORRADOR,
                 "No se puede borrar: torneo no está en BORRADOR");

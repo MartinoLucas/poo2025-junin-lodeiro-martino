@@ -36,7 +36,7 @@ public class InscripcionServiceImpl extends BaseServiceSupport implements Inscri
     @Transactional
     public InscripcionResponseDTO create(CreateInscripcionDTO dto) {
         Participante p = orNotFound(participanteRepo.findById(dto.getParticipanteId()), "Participante no encontrado");
-        Competencia c = orNotFound(competenciaRepo.findByIdWithTorneo(dto.getCompetenciaId()), "Competencia no encontrada");
+        Competencia c = orNotFound(competenciaRepo.findWithTorneoById(dto.getCompetenciaId()), "Competencia no encontrada");
 
         check(c.hayCupo(), "No hay cupo disponible");
         check(repo.findByParticipante_IdAndCompetencia_Id(dto.getParticipanteId(), dto.getCompetenciaId()).isPresent(),
