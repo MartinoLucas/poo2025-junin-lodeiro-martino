@@ -19,4 +19,6 @@ public interface ParticipanteService {
     ParticipanteResponseDTO get(Long id);
 
     Page<ParticipanteResponseDTO> list(Pageable pageable);
+
+    ParticipanteResponseDTO findByEmail(String email);
 }

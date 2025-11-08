@@ -77,4 +77,11 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
     public Page<ParticipanteResponseDTO> list(Pageable pageable) {
         return repo.findAll(pageable).map(mapper::toResponse);
     }
+
+    @Override
+    public ParticipanteResponseDTO findByEmail(String email) {
+        Participante p = orNotFound(repo.findByEmail_Value(email), "Participante no encontrado");
+
+        return mapper.toResponse(p);
+    }
 }
