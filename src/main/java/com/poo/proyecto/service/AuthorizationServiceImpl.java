@@ -2,6 +2,7 @@ package com.poo.proyecto.service;
 
 import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.entity.Participante;
+import com.poo.proyecto.exception.ForbiddenException;
 import com.poo.proyecto.util.JwtTokenUtil;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +18,8 @@ public class AuthorizationServiceImpl extends BaseServiceSupport implements Auth
     }
 
     @Override
-    public ParticipanteResponseDTO authorize(String token) throws Exception {
-        check(jwtTokenUtil.verify(token)," no valido") ;
+    public ParticipanteResponseDTO authorize(String token) {
+        if(!jwtTokenUtil.verify(token)) throw new ForbiddenException("Token invalido");
 
         String email = jwtTokenUtil.getSubject(token);
 

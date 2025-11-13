@@ -1,5 +1,6 @@
 package com.poo.proyecto.api;
 
+import com.poo.proyecto.exception.ForbiddenException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,18 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleForbidden(ForbiddenException ex, HttpServletRequest request) {
+        return new ApiError(
+                "forbidden",
+                "Acceso denegado",
+                403,
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
