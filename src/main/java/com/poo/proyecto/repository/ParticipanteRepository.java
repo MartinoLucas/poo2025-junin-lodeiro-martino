@@ -18,5 +18,8 @@ public interface ParticipanteRepository extends JpaRepository<Participante, Long
     boolean existsByDocumento_TipoAndDocumento_Numero(TipoDocumento tipo, String numero);
 
     boolean existsByEmail_Value(String email);
+
+
+    Optional<Participante> findByEmail_Value(String email);
 }
 
