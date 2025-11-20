@@ -31,12 +31,16 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class
                 )
                 .authorizeHttpRequests(auth -> auth
-                        // Podés permitir login sin token si existe login
-                        //.requestMatchers("/auth").permitAll()
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/users").permitAll()
-                        .anyRequest().authenticated()
-                );
+                        .requestMatchers(HttpMethod.POST, "/accounts").permitAll()
+
+                        // solo admin
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+
+                        // resto requiere ADMIN o PARTICIPANTE
+                        .requestMatchers("/**").hasAnyRole("ADMIN", "PARTICIPANTE")
+                )
+        ;
 
         return http.build();
     }

@@ -3,6 +3,7 @@ package com.poo.proyecto.service;
 import com.poo.proyecto.dto.user.CreateUserDTO;
 import com.poo.proyecto.dto.user.UpdateUserDTO;
 import com.poo.proyecto.dto.user.UserResponseDTO;
+import com.poo.proyecto.entity.Role;
 import com.poo.proyecto.entity.UserAccount;
 import com.poo.proyecto.entity.base.Email;
 import com.poo.proyecto.mapper.ParticipanteMapper;
@@ -33,10 +34,13 @@ public class UserAccountServiceImpl extends BaseServiceSupport implements UserAc
 
     @Override
     @Transactional
-    public UserResponseDTO create(CreateUserDTO dto) {
+    public UserResponseDTO create(CreateUserDTO dto, String role) {
         check(!repo.existsByEmailValueAndDeletedAtIsNull(dto.getEmail().getValue()), "Ya existe una cuenta con ese email");
 
         UserAccount u = userMapper.toEntity(dto);
+        Role userRole = new Role();
+        userRole.setName(role);
+        u.getRoles().add(userRole);
 
         //Como se ignora la password al mapear, se setea aqui luego de ser encodeada
         u.setPasswordHash(passwordEncoder.encode(dto.getPassword()));
@@ -89,8 +93,8 @@ public class UserAccountServiceImpl extends BaseServiceSupport implements UserAc
 
     @Override
     @Transactional(readOnly = true)
-    public Page<UserResponseDTO> list(Pageable pageable) {
+    public Page<UserResponseDTO> listActiveAdmin(Pageable pageable) {
 
-        return repo.findAll(pageable).map(userMapper::toResponse);
+        return repo.findActiveByRole("ROLE_ADMIN", pageable).map(userMapper::toResponse);
     }
 }

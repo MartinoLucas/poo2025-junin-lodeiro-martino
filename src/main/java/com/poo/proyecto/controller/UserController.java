@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/admin/accounts")
 public class UserController {
 
     private final UserAccountService service;
@@ -20,12 +20,12 @@ public class UserController {
 
     @PostMapping
     public ResponseEntity<UserResponseDTO> create(@RequestBody @Valid CreateUserDTO dto) {
-        return ResponseEntity.status(201).body(service.create(dto));
+        return ResponseEntity.status(201).body(service.create(dto, "ROLE_ADMIN"));
     }
 
     @GetMapping
     public ResponseEntity<Page<UserResponseDTO>> list(Pageable pageable ) {
-        return ResponseEntity.ok(service.list(pageable));
+        return ResponseEntity.ok(service.listActiveAdmin(pageable));
     }
 
     @GetMapping("/{id}")

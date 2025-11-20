@@ -10,6 +10,7 @@ import com.poo.proyecto.mapper.InscripcionMapper;
 import com.poo.proyecto.repository.CompetenciaRepository;
 import com.poo.proyecto.repository.InscripcionRepository;
 import com.poo.proyecto.repository.ParticipanteRepository;
+import com.poo.proyecto.service.policy.PrecioInscripcionPolicy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,14 +23,16 @@ public class InscripcionServiceImpl extends BaseServiceSupport implements Inscri
     private final ParticipanteRepository participanteRepo;
     private final CompetenciaRepository competenciaRepo;
     private final InscripcionMapper mapper;
+    private final PrecioInscripcionPolicy precioPolicy;
 
     public InscripcionServiceImpl(InscripcionRepository repo,
                                   ParticipanteRepository participanteRepo,
-                                  CompetenciaRepository competenciaRepo, InscripcionMapper mapper) {
+                                  CompetenciaRepository competenciaRepo, InscripcionMapper mapper, PrecioInscripcionPolicy precioPolicy) {
         this.repo = repo;
         this.participanteRepo = participanteRepo;
         this.competenciaRepo = competenciaRepo;
         this.mapper = mapper;
+        this.precioPolicy = precioPolicy;
     }
 
     @Override
@@ -39,14 +42,26 @@ public class InscripcionServiceImpl extends BaseServiceSupport implements Inscri
         Competencia c = orNotFound(competenciaRepo.findWithTorneoById(dto.getCompetenciaId()), "Competencia no encontrada");
 
         check(c.hayCupo(), "No hay cupo disponible");
+
         check(repo.findByParticipante_IdAndCompetencia_Id(dto.getParticipanteId(), dto.getCompetenciaId()).isPresent(),
                 "Participante ya inscrito en esta competencia");
-        check(dto.getPrecioPagado()!=null, "Precio Pagado no puede ser nulo");
-        check(dto.getFechaInscripcion()!=null, "Fecha Inscripcion no puede ser nulo");
+
+        // Calcular si tiene inscripciones previas en el mismo torneo
+        long previas = repo.countByParticipante_IdAndCompetencia_Torneo_Id(
+                p.getId(),
+                c.getTorneo().getId()
+        );
+
+        // strategy del precio
+        Money precioFinal = precioPolicy.calcular(c.getPrecioBase(), previas);
+
+        check(dto.getFechaInscripcion().isBefore(c.getTorneo().getFechaInicio().atStartOfDay()), "No se puede inscribir después de que inicie el torneo");
 
         c.incrementarInscriptos();
 
         Inscripcion i = mapper.toEntity(dto);
+
+        i.setPrecioPagado(precioFinal);
 
         return mapper.toResponse(repo.save(i));
     }
@@ -62,5 +77,11 @@ public class InscripcionServiceImpl extends BaseServiceSupport implements Inscri
     @Transactional(readOnly = true)
     public Page<InscripcionResponseDTO> list(Pageable pageable) {
         return repo.findAll(pageable).map(mapper::toResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<InscripcionResponseDTO> listByParticipanteId(Long participanteId, Pageable pageable) {
+        return repo.findByParticipante_Id(participanteId, pageable).map(mapper::toResponse);
     }
 }

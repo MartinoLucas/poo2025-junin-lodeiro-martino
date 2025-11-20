@@ -1,5 +1,9 @@
 package com.poo.proyecto.controller;
 
+import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
+import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
+import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
+import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.torneo.CreateTorneoDTO;
 import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
 import com.poo.proyecto.dto.torneo.UpdateTorneoDTO;
@@ -11,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/torneos")
+@RequestMapping("/admin/tournaments")
 public class TorneoController {
 
     private final TorneoService service;
@@ -33,13 +37,13 @@ public class TorneoController {
     }
 
     // Publicar un torneo
-    @PutMapping("/{id}/publicar")
+    @PutMapping("/{id}/publish")
     public ResponseEntity<TorneoResponseDTO> publish(@PathVariable Long id) {
         return ResponseEntity.ok(service.publish(id));
     }
 
     // Finalizar un torneo
-    @PutMapping("/{id}/finalizar")
+    @PutMapping("/{id}/finalize")
     public ResponseEntity<TorneoResponseDTO> finalizeTournament(@PathVariable Long id) {
         return ResponseEntity.ok(service.finalizeTournament(id));
     }
@@ -61,5 +65,40 @@ public class TorneoController {
     @GetMapping("/publicados")
     public ResponseEntity<Page<TorneoResponseDTO>> listPublished(Pageable pageable) {
         return ResponseEntity.ok(service.listPublished(pageable));
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<TorneoResponseDTO>> listAll(Pageable pageable) {
+        return ResponseEntity.ok(service.listAll(pageable));
+    }
+
+    @GetMapping("/{id}/competitions")
+    public ResponseEntity<Page<CompetenciaResponseDTO>> listCompetitionsByTournament(@PathVariable Long id, Pageable pageable) {
+        return ResponseEntity.ok(this.service.findAllByTorneoId(id, pageable));
+    }
+
+    @GetMapping("/{tournamentId}/competitions/{id}")
+    public ResponseEntity<CompetenciaResponseDTO> getCompetitionByTournamentByCompetitionId(@PathVariable Long tournamentId, @PathVariable Long id) {
+        return ResponseEntity.ok(this.service.getByTorneoIdByCompetitionId(tournamentId, id));
+    }
+
+    @PostMapping("/{tournamentId}")
+    public ResponseEntity<CompetenciaResponseDTO> createCompetitionInTournament(@PathVariable Long tournamentId, @RequestBody @Valid CreateCompetenciaDTO dto) {
+        return ResponseEntity.status(201).body(service.createCompetitionInTournament(tournamentId, dto));
+    }
+
+    @PutMapping("/{tournamentId}/competitions/{id}")
+    public ResponseEntity<CompetenciaResponseDTO> updateCompetitionInTournament(@PathVariable Long tournamentId, @PathVariable Long id, @RequestBody @Valid UpdateCompetenciaDTO dto) {
+        CompetenciaResponseDTO updatedCompetition = service.updateCompetitionInTournament(tournamentId, id, dto);
+        return ResponseEntity.ok(updatedCompetition);
+    }
+
+    @GetMapping("/{tournamentId}/competitions/{id}/inscriptions")
+    public ResponseEntity<Page<ParticipanteResponseDTO>> listInscriptionsByCompetition(
+            @PathVariable Long tournamentId,
+            @PathVariable Long id,
+            Pageable pageable) {
+        Page<ParticipanteResponseDTO> inscriptions = service.listInscriptionsByCompetition(tournamentId, id, pageable);
+        return ResponseEntity.ok(inscriptions);
     }
 }

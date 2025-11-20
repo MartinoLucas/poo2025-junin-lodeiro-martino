@@ -6,6 +6,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.List;
 
 @Component
 public class JwtTokenUtil {
@@ -14,9 +15,10 @@ public class JwtTokenUtil {
     private static final long EXPIRATION = 1000L * 60 * 60 * 24 * 10; // 10 días
     private final Algorithm algorithm = Algorithm.HMAC512(SECRET);
 
-    public String generateToken(String subject) {
+    public String generateToken(String subject, List<String> roles) {
         String token = JWT.create()
                 .withSubject(subject)
+                .withClaim("roles", roles)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION))
                 .sign(algorithm);
         return "Bearer " + token;
@@ -36,7 +38,7 @@ public class JwtTokenUtil {
         return decoded.getSubject();
     }
 
-    private String stripPrefix(String token) {
+    public String stripPrefix(String token) {
         return token.startsWith("Bearer ") ? token.substring(7) : token;
     }
 }

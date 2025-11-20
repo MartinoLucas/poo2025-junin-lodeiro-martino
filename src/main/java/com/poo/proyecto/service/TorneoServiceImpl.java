@@ -1,5 +1,9 @@
 package com.poo.proyecto.service;
 
+import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
+import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
+import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
+import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.torneo.CreateTorneoDTO;
 import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
 import com.poo.proyecto.dto.torneo.UpdateTorneoDTO;
@@ -24,10 +28,14 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
 
     private final TorneoRepository repo;
     private final TorneoMapper mapper;
+    private final CompetenciaService competenciaService;
+    private final ParticipanteService participanteService;
 
-    public TorneoServiceImpl(TorneoRepository repo, TorneoMapper mapper) {
+    public TorneoServiceImpl(TorneoRepository repo, TorneoMapper mapper, CompetenciaService competenciaService, ParticipanteService participanteService) {
         this.repo = repo;
         this.mapper = mapper;
+        this.competenciaService = competenciaService;
+        this.participanteService = participanteService;
     }
 
     @Override @Transactional
@@ -99,5 +107,35 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     @Override @Transactional(readOnly = true)
     public Page<TorneoResponseDTO> listPublished(Pageable pageable) {
         return repo.findAllByEstado(TorneoStatus.PUBLICADO, pageable).map(mapper::toResponse);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Page<TorneoResponseDTO> listAll(Pageable pageable) {
+        return repo.findAll(pageable).map(mapper::toResponse);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public Page<CompetenciaResponseDTO> findAllByTorneoId(Long torneoId, Pageable pageable) {
+        return this.competenciaService.listByTorneo(torneoId, pageable);
+    }
+
+    @Override @Transactional(readOnly = true)
+    public CompetenciaResponseDTO getByTorneoIdByCompetitionId(Long torunamentId, Long id) {
+        return this.competenciaService.get(id);
+    }
+
+    @Override @Transactional
+    public CompetenciaResponseDTO createCompetitionInTournament(Long tournamentId, CreateCompetenciaDTO dto) {
+        return this.competenciaService.create(dto);
+    }
+
+    @Override @Transactional
+    public CompetenciaResponseDTO updateCompetitionInTournament(Long tournamentId, Long competitionId, UpdateCompetenciaDTO dto) {
+        return this.competenciaService.update(competitionId, dto);
+    }
+
+    @Override
+    public Page<ParticipanteResponseDTO> listInscriptionsByCompetition(Long tournamentId, Long competitionId, Pageable pageable) {
+        return this.participanteService.listByCompetitionId(competitionId, pageable);
     }
 }

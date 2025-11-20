@@ -49,4 +49,9 @@ public class UserAccount extends Auditable {
 
     @Transient
     public boolean isActive() { return deletedAt == null; }
+
+    public boolean hasRole(String roleName) {
+        return roles.stream().anyMatch(r -> roleName.equals(r.getName()));
+    }
+
 }

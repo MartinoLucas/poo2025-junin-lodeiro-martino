@@ -1,6 +1,7 @@
 package com.poo.proyecto.service;
 
 import com.poo.proyecto.dto.authentication.AuthenticationRequestDTO;
+import com.poo.proyecto.entity.Role;
 import com.poo.proyecto.entity.UserAccount;
 import com.poo.proyecto.repository.UserAccountRepository;
 import com.poo.proyecto.util.JwtTokenUtil;
@@ -21,12 +22,24 @@ public class AuthenticationServiceImpl  extends BaseServiceSupport implements Au
     }
 
     @Override
-    public String authenticate(AuthenticationRequestDTO dto)  {
+    public String authenticateAdmin(AuthenticationRequestDTO dto)  {
         UserAccount user = orNotFound(userRepo.findByEmail_ValueIgnoreCase(dto.getEmail()) , "Email No Registrado");
 
+        check(user.hasRole("ROLE_ADMIN"), "Acceso Denegado");
 
         check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), "Credenciales Invalidas" );
 
-        return jwtTokenUtil.generateToken(user.getEmail().value());
+        return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList());
+    }
+
+    @Override
+    public String authenticateParticipant(AuthenticationRequestDTO dto)  {
+        UserAccount user = orNotFound(userRepo.findByEmail_ValueIgnoreCase(dto.getEmail()) , "Email No Registrado");
+
+        check((user.hasRole("ROLE_ADMIN") || user.hasRole("ROLE_PARTCIPANT")), "Acceso Denegado");
+
+        check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), "Credenciales Invalidas" );
+
+        return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList());
     }
 }

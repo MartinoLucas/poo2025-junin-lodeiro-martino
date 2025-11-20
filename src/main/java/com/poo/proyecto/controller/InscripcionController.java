@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/inscripciones")
+@RequestMapping
 public class InscripcionController {
 
     private final InscripcionService service;
@@ -19,17 +19,17 @@ public class InscripcionController {
         this.service = service;
     }
 
-    @PostMapping
+    @PostMapping(("/tournaments/{torunamentId}/competitions/{id}/inscriptions"))
     public ResponseEntity<InscripcionResponseDTO> create(@RequestBody @Valid CreateInscripcionDTO dto) {
         return ResponseEntity.status(201).body(service.create(dto));
     }
 
-    @GetMapping
-    public ResponseEntity<Page<InscripcionResponseDTO>> list(Pageable pageable) {
-        return ResponseEntity.ok(service.list(pageable));
-    }
+//    @GetMapping
+//    public ResponseEntity<Page<InscripcionResponseDTO>> list(Pageable pageable) {
+//        return ResponseEntity.ok(service.list(pageable));
+//    }
 
-    @GetMapping("/{id}")
+    @GetMapping("/inscriptions/{id}")
     public ResponseEntity<InscripcionResponseDTO> get(@PathVariable Long id) {
         return ResponseEntity.ok(service.get(id));
     }

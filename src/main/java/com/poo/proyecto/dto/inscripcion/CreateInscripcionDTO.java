@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 public class CreateInscripcionDTO {
     private Long participanteId;
     private Long competenciaId;
-    private MoneyDTO precioPagado;
     private LocalDateTime fechaInscripcion;
 
     // getters y setters
@@ -25,14 +24,6 @@ public class CreateInscripcionDTO {
 
     public void setCompetenciaId(Long competenciaId) {
         this.competenciaId = competenciaId;
-    }
-
-    public MoneyDTO getPrecioPagado() {
-        return precioPagado;
-    }
-
-    public void setPrecioPagado(MoneyDTO precioPagado) {
-        this.precioPagado = precioPagado;
     }
 
     public LocalDateTime getFechaInscripcion() {

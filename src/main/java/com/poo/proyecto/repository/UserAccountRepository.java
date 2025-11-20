@@ -1,7 +1,12 @@
 package com.poo.proyecto.repository;
 
+import com.poo.proyecto.dto.user.UserResponseDTO;
 import com.poo.proyecto.entity.UserAccount;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -24,5 +29,19 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
      * Busca una cuenta de usuario por su email (case-insensitive).
      */
     Optional<UserAccount> findByEmail_ValueIgnoreCase(String email);
+
+
+    /**
+     * Retorna una página de usuarios activos (no eliminados) que tengan el rol especificado.
+     */
+    @Query("""
+       SELECT DISTINCT u
+       FROM UserAccount u
+       JOIN u.roles r
+       WHERE u.deletedAt IS NULL
+         AND r.name = :role
+       """)
+    Page<UserAccount> findActiveByRole(@Param("role") String role, Pageable pageable);
+
 }
 

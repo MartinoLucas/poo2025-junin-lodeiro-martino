@@ -21,4 +21,6 @@ public interface ParticipanteService {
     Page<ParticipanteResponseDTO> list(Pageable pageable);
 
     ParticipanteResponseDTO findByEmail(String email);
+
+    Page<ParticipanteResponseDTO> listByCompetitionId(Long competitionId, Pageable pageable);
 }

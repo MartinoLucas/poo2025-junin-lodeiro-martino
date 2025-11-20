@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping
 public class AuthController {
 
     private final AuthenticationService authenticationService;
@@ -21,9 +21,15 @@ public class AuthController {
         this.authenticationService = authenticationService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequestDTO dto) {
-        String token = authenticationService.authenticate(dto);
+    @PostMapping("/admin/auth")
+    public ResponseEntity<?> authenticateAdmin(@RequestBody AuthenticationRequestDTO dto) {
+        String token = authenticationService.authenticateAdmin(dto);
+        return ResponseEntity.ok(Map.of("token", token));
+    }
+
+    @PostMapping("/auth")
+    public ResponseEntity<?> authenticateParticipant(@RequestBody AuthenticationRequestDTO dto) {
+        String token = authenticationService.authenticateParticipant(dto);
         return ResponseEntity.ok(Map.of("token", token));
     }
 

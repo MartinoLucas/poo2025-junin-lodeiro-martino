@@ -9,11 +9,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface UserAccountService {
-    UserResponseDTO create(CreateUserDTO dto);
+    UserResponseDTO create(CreateUserDTO dto, String role);
     UserResponseDTO get(Long id);
     UserResponseDTO update(Long id, UpdateUserDTO dto);
     void deactivate(Long id);
     void activate(Long id);
-    Page<UserResponseDTO> list(Pageable pageable);
+    Page<UserResponseDTO> listActiveAdmin(Pageable pageable);
 }
 

@@ -4,14 +4,15 @@ import com.poo.proyecto.dto.common.DocumentoDTO;
 import com.poo.proyecto.dto.common.EmailDTO;
 
 public class CreateParticipanteDTO {
-    private Long userId;
+//    private Long userId;
     private String nombre;
     private String apellido;
     private DocumentoDTO documento;
     private EmailDTO email;
+    private String password;
 
-    public Long getUserId() { return userId; }
-    public void setUserId(Long userId) { this.userId = userId; }
+//    public Long getUserId() { return userId; }
+//    public void setUserId(Long userId) { this.userId = userId; }
 
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
@@ -24,4 +25,7 @@ public class CreateParticipanteDTO {
 
     public EmailDTO getEmail() { return email; }
     public void setEmail(EmailDTO email) { this.email = email; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
 }
