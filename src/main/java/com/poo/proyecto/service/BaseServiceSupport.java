@@ -25,9 +25,36 @@ public abstract class BaseServiceSupport {
 
     }
 
+    /**
+     *
+     * @param opt
+     * @param exceptionSupplier
+     * @return
+     * @param <T>
+     */
+    protected <T> T orThrow(Optional<T> opt, Supplier<RuntimeException> exceptionSupplier) {
+        return opt.orElseThrow(exceptionSupplier);
+    }
+
+    /**
+     *
+     * @param condition
+     * @param msg
+     */
     protected void check(boolean condition, String msg) {
         if (!condition) throw new RuntimeException(msg);
 
+    }
+
+    /**
+     *
+     * @param condition
+     * @param exSupplier
+     */
+    protected void check(boolean condition, Supplier<? extends RuntimeException> exSupplier) {
+        if (!condition) {
+            throw exSupplier.get();
+        }
     }
 
     protected Pageable page(int page, int size){

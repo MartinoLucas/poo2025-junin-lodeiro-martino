@@ -3,6 +3,7 @@ package com.poo.proyecto.service;
 import com.poo.proyecto.dto.authentication.AuthenticationRequestDTO;
 import com.poo.proyecto.entity.Role;
 import com.poo.proyecto.entity.UserAccount;
+import com.poo.proyecto.exception.ForbiddenException;
 import com.poo.proyecto.repository.UserAccountRepository;
 import com.poo.proyecto.util.JwtTokenUtil;
 import com.poo.proyecto.util.PasswordEncoder;
@@ -25,9 +26,9 @@ public class AuthenticationServiceImpl  extends BaseServiceSupport implements Au
     public String authenticateAdmin(AuthenticationRequestDTO dto)  {
         UserAccount user = orNotFound(userRepo.findByEmail_ValueIgnoreCase(dto.getEmail()) , "Email No Registrado");
 
-        check(user.hasRole("ROLE_ADMIN"), "Acceso Denegado");
+        check(user.hasRole("ROLE_ADMIN"), () -> new ForbiddenException("Acceso Denegado"));
 
-        check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), "Credenciales Invalidas" );
+        check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), () -> new ForbiddenException("Credenciales Invalidas"));
 
         return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList());
     }
