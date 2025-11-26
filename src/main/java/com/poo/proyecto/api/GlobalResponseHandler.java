@@ -26,7 +26,13 @@ public class GlobalResponseHandler implements ResponseBodyAdvice<Object> {
             return body;
         }
 
-        // respuesta normal (200 OK)
+        //si la peticion retorno codigo 201 usar iResponse.created
+        if (((ServletServerHttpRequest) request).getServletRequest().getMethod().equals("POST")
+                && response.getHeaders().getLocation() != null) {
+            return ApiResponse.created(body);
+        }
+
+        // envolver en ApiResponse.ok
         return ApiResponse.ok(body);
     }
 }

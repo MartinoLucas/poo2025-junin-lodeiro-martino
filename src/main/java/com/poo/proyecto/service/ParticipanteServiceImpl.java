@@ -7,6 +7,7 @@ import com.poo.proyecto.dto.user.CreateUserDTO;
 import com.poo.proyecto.dto.user.UserResponseDTO;
 import com.poo.proyecto.entity.Inscripcion;
 import com.poo.proyecto.entity.Participante;
+import com.poo.proyecto.entity.Role;
 import com.poo.proyecto.entity.UserAccount;
 import com.poo.proyecto.entity.base.Documento;
 import com.poo.proyecto.entity.base.Email;
@@ -14,12 +15,16 @@ import com.poo.proyecto.mapper.ParticipanteMapper;
 import com.poo.proyecto.mapper.UserAccountMapper;
 import com.poo.proyecto.repository.InscripcionRepository;
 import com.poo.proyecto.repository.ParticipanteRepository;
+import com.poo.proyecto.repository.RoleRepository;
 import com.poo.proyecto.repository.UserAccountRepository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 public class ParticipanteServiceImpl extends BaseServiceSupport implements ParticipanteService {
@@ -30,14 +35,16 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
     private final UserAccountMapper userMapper;
     private final UserAccountService userAccountService;
     private final InscripcionRepository inscripcionRepository;
+    private final RoleRepository roleRepo;
 
-    public ParticipanteServiceImpl(ParticipanteRepository repo, UserAccountRepository userRepo, ParticipanteMapper mapper, UserAccountMapper userMapper, UserAccountService userAccountService, InscripcionRepository inscripcionRepository) {
+    public ParticipanteServiceImpl(ParticipanteRepository repo, UserAccountRepository userRepo, ParticipanteMapper mapper, UserAccountMapper userMapper, UserAccountService userAccountService, InscripcionRepository inscripcionRepository, RoleRepository roleRepo) {
         this.repo = repo;
         this.userRepo = userRepo;
         this.mapper = mapper;
         this.userMapper = userMapper;
         this.userAccountService = userAccountService;
         this.inscripcionRepository = inscripcionRepository;
+        this.roleRepo = roleRepo;
     }
 
     @Override
@@ -51,10 +58,12 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
         CreateUserDTO dtoUser = new CreateUserDTO();
         dtoUser.setEmail(dto.getEmail());
         dtoUser.setPassword(dto.getPassword());
-        UserResponseDTO newUser = this.userAccountService.create(dtoUser, "ROLE_PARTICIPANT");
+        Long newUserId = this.userAccountService.create(dtoUser, "ROLE_PARTICIPANT").getId();
+        UserAccount ua = orNotFound(userRepo.findById(newUserId), "UserAccount no encontrado despues de creacion");
 
         Participante p = mapper.toEntity(dto);
-        p.setUserAccount(userMapper.toEntity(dtoUser));
+
+        p.setUserAccount(ua);
 
         return mapper.toResponse(repo.save(p));
     }

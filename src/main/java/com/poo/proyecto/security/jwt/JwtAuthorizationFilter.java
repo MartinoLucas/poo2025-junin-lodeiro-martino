@@ -30,9 +30,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String path = request.getServletPath();
         String method = request.getMethod();
 
-        // ignoramos /auth y POST /users
-        if (path.startsWith("/auth")) return true;
-        if (path.equals("/users") && method.equals("POST")) return true;
+        // ignoramos /auth y POST /accounts
+        if (path.startsWith("/auth") || path.startsWith("/admin/auth")) return true;
+        if (path.equals("/accounts") && method.equals("POST")) return true;
 
         return false;
     }

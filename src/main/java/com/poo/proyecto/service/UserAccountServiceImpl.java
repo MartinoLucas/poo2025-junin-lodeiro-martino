@@ -9,12 +9,16 @@ import com.poo.proyecto.entity.base.Email;
 import com.poo.proyecto.mapper.ParticipanteMapper;
 import com.poo.proyecto.mapper.UserAccountMapper;
 import com.poo.proyecto.mapper.common.EmailMapper;
+import com.poo.proyecto.repository.RoleRepository;
 import com.poo.proyecto.repository.UserAccountRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
+
 import com.poo.proyecto.util.PasswordEncoder;
 
 @Service
@@ -24,23 +28,33 @@ public class UserAccountServiceImpl extends BaseServiceSupport implements UserAc
     private final UserAccountMapper userMapper;
     private final EmailMapper emailMapper;
     private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepo;
 
-    public UserAccountServiceImpl(UserAccountRepository repo, UserAccountMapper userMapper, EmailMapper emailMapper, PasswordEncoder passwordEncoder) {
+    public UserAccountServiceImpl(UserAccountRepository repo, UserAccountMapper userMapper, EmailMapper emailMapper, PasswordEncoder passwordEncoder, RoleRepository roleRepo) {
         this.repo = repo;
         this.userMapper = userMapper;
         this.emailMapper = emailMapper;
         this.passwordEncoder = passwordEncoder;
+        this.roleRepo = roleRepo;
     }
 
     @Override
     @Transactional
-    public UserResponseDTO create(CreateUserDTO dto, String role) {
+    public UserResponseDTO create(CreateUserDTO dto, String defaultRoleName) {
         check(!repo.existsByEmailValueAndDeletedAtIsNull(dto.getEmail().getValue()), "Ya existe una cuenta con ese email");
 
         UserAccount u = userMapper.toEntity(dto);
-        Role userRole = new Role();
-        userRole.setName(role);
-        u.getRoles().add(userRole);
+
+        // Cargar roles desde la BD
+        Set<Role> roles = new HashSet<>();
+        if (dto.getRoleIds() != null && !dto.getRoleIds().isEmpty()) {
+            roles.addAll(roleRepo.findAllById(dto.getRoleIds()));
+        }
+
+        Role defaultRole = orNotFound(roleRepo.findByNameIgnoreCase(defaultRoleName), "Rol por defecto no encontrado");
+        roles.add(defaultRole);
+
+        u.setRoles(roles);
 
         //Como se ignora la password al mapear, se setea aqui luego de ser encodeada
         u.setPasswordHash(passwordEncoder.encode(dto.getPassword()));

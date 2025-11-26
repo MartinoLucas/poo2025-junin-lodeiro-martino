@@ -36,7 +36,7 @@ public class AuthenticationServiceImpl  extends BaseServiceSupport implements Au
     public String authenticateParticipant(AuthenticationRequestDTO dto)  {
         UserAccount user = orNotFound(userRepo.findByEmail_ValueIgnoreCase(dto.getEmail()) , "Email No Registrado");
 
-        check((user.hasRole("ROLE_ADMIN") || user.hasRole("ROLE_PARTCIPANT")), "Acceso Denegado");
+        check((user.hasRole("ROLE_ADMIN") || user.hasRole("ROLE_PARTICIPANT")), "Acceso Denegado");
 
         check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), "Credenciales Invalidas" );
 

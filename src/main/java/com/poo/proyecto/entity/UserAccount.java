@@ -46,6 +46,7 @@ public class UserAccount extends Auditable {
     public void setEmail(Email email) { this.email = email; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
     public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+    public void setRoles(Set<Role> roles) { this.roles = roles; }
 
     @Transient
     public boolean isActive() { return deletedAt == null; }
