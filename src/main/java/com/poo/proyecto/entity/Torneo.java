@@ -83,12 +83,12 @@ public class Torneo extends Auditable {
     public void setEstado(TorneoStatus estado) { this.estado = estado; this.runtimeState = TorneoStateFactory.from(estado); }
 
     public void publicar() {
-        ensureState();
+        ensureState();  // asegura que la clase State sea la misma que el Status
         runtimeState.publicar(this);
     }
 
     public void finalizar() {
-        ensureState();
+        ensureState();  // asegura que la clase State sea la misma que el Status
         runtimeState.finalizar(this);
     }
 
