@@ -20,6 +20,9 @@ public abstract class BaseServiceSupport {
      * @return
      * @param <T>
      */
+
+    // sacar un valor de un Optional
+    //y si no existe, lanzar una EntityNotFoundException
     protected <T> T orNotFound(Optional<T> opt, String msg) {
         return opt.orElseThrow(() -> new EntityNotFoundException(msg));
 
@@ -41,6 +44,8 @@ public abstract class BaseServiceSupport {
      * @param condition
      * @param msg
      */
+
+    //Valida una condición Si es falsa → lanza RuntimeException con el mensaje.
     protected void check(boolean condition, String msg) {
         if (!condition) throw new RuntimeException(msg);
 
@@ -51,6 +56,8 @@ public abstract class BaseServiceSupport {
      * @param condition
      * @param exSupplier
      */
+
+    //Igual que el anterior pero permite elegir la excepción exacta.
     protected void check(boolean condition, Supplier<? extends RuntimeException> exSupplier) {
         if (!condition) {
             throw exSupplier.get();

@@ -2,10 +2,10 @@ package com.poo.proyecto.entity.base;
 import com.poo.proyecto.entity.TipoDocumento;
 import jakarta.persistence.*;
 
-@Embeddable
+@Embeddable // indica que esta clase se incrusta dentro de otra tabla. Sus atributos se guardan como columnas dentro de la entidad donde se usa.
 public class Documento {
 
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING) // se guarda en la base de datos como tipo string
     @Column(name = "tipo_documento", length = 20, nullable = false)
     private TipoDocumento tipo;
 

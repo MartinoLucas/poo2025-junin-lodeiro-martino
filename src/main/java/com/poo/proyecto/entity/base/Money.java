@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 @Embeddable // indica que esta clase se puede incrustar en una entidad
+
+// es una value object, inmutable no se modifican sus atributos despues de crearse, se compara cpor valor (equals y hasccode)
 public class Money {
 
     @Column(name = "amount", precision = 12, scale = 2, nullable = false)
@@ -24,8 +26,8 @@ public class Money {
 
     public static Money of(BigDecimal amount) { return new Money(amount); }
 
-    public BigDecimal getAmount() { return amount; }
-    public String getCurrency() { return currency; }
+    public BigDecimal getAmount() { return amount; } // devuelve el monto
+    public String getCurrency() { return currency; } // devuelve la moneda
 
     // helpers de dominio (no rompen el “solo models”)
     public Money add(Money other) { return new Money(this.amount.add(other.amount)); }

@@ -46,24 +46,27 @@ public class Torneo extends Auditable {
 
     /* ---------- Métodos utilitarios de dominio (no servicio) ---------- */
 
+    // Mientras "estado" es solo un texto,  "runtimeState" es el OBJETO que tiene la lógica real.
+
     @Transient
     private TorneoState runtimeState;
 
+    //Cada vez que se carga o guarda el torneo, recreamos el objeto de estado real a partir del ENUM guardado.
     @PostLoad @PostPersist
     private void initState() { this.runtimeState = TorneoStateFactory.from(this.estado); }
 
     @Transient
-    public boolean puedeEditar() {
+    public boolean puedeEditar() { // preguntra si se puede editar, en borrador si
         ensureState();
         return runtimeState.puedeEditar(this);
     }
-
+    //Pregunta si se permiten inscripciones en la fecha PUBLICADO → depende de la fecha
     @Transient
     public boolean puedeInscribir(LocalDate hoy) {
         ensureState();
         return runtimeState.puedeInscribir(this, hoy);
     }
-
+    //Si el runtimeState todavía no existe, lo creamos. Evita errores cuando el objeto no vino de la BD.
     private void ensureState() {
         if (runtimeState == null) runtimeState = TorneoStateFactory.from(this.estado);
     }

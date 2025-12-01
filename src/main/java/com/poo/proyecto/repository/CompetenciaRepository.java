@@ -11,7 +11,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@Repository  //@Repository es una anotación de Spring que marca a la clase o interfaz como parte de la capa de acceso a datos.
+//// Le dice a Spring que esta clase se encarga de hablar con la base de datos.
+
 public interface CompetenciaRepository extends JpaRepository<Competencia, Long> {
 
     // Busca competencias de un torneo

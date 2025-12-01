@@ -14,12 +14,15 @@ import jakarta.validation.constraints.NotBlank;
 public class Competencia extends Auditable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Identificador único autogenerado por la base de datos
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "torneo_id", nullable = false,
             foreignKey = @ForeignKey(name = "fk_competencia_torneo"))
+
+    // Relación N competencas → 1 torneo
+    // Lazy loading para no cargar el torneo completo innecesariamente
     private Torneo torneo;
 
     @NotBlank

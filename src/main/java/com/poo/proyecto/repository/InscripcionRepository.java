@@ -21,8 +21,10 @@ public interface InscripcionRepository extends JpaRepository<Inscripcion, Long> 
     // Verificar si ya está inscripto un participante en una competencia
     Optional<Inscripcion> findByParticipante_IdAndCompetencia_Id(Long participanteId, Long competenciaId);
 
+    // Cuenta cuántas inscripciones tiene un participante dentro de un torneo.
     int countByParticipante_IdAndCompetencia_Torneo_Id(Long participanteId, Long torneoId);
 
+    // Igual que findByCompetencia_Id pero con paginación.
     Page<Inscripcion> findByCompetencia_Id(Long competenciaId, Pageable pageable);
 
 }
