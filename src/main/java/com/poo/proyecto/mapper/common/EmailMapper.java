@@ -11,8 +11,16 @@ public interface EmailMapper {
         return new EmailDTO(email.value());
     }
 
-    default Email toEntity(EmailDTO dto) {
-        if (dto == null) return null;
-        return new Email(dto.getValue());
+    // MapStruct usará esto para: String -> Email
+    public default Email toEntity(String value) {
+        if (value == null) return null;
+        Email email = new Email();
+        email.setValue(value);
+        return email;
+    }
+
+    // MapStruct usará esto para: Email -> String
+    public default String toString(Email email) {
+        return email != null ? email.getValue() : null;
     }
 }

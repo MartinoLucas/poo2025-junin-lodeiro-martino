@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public class EmailDTO {
     private final String value;
 
-    @JsonCreator
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public EmailDTO(String value) {
         this.value = value;
     }

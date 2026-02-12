@@ -3,6 +3,7 @@ package com.poo.proyecto.controller;
 import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
 import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
 import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
+import com.poo.proyecto.dto.inscripcion.InscripcionResponseDTO;
 import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.torneo.CreateTorneoDTO;
 import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
@@ -84,6 +85,7 @@ public class TorneoController {
 
     @PostMapping("/{tournamentId}")
     public ResponseEntity<CompetenciaResponseDTO> createCompetitionInTournament(@PathVariable Long tournamentId, @RequestBody @Valid CreateCompetenciaDTO dto) {
+        dto.setTorneoId(tournamentId);
         return ResponseEntity.status(201).body(service.createCompetitionInTournament(tournamentId, dto));
     }
 
@@ -94,11 +96,11 @@ public class TorneoController {
     }
 
     @GetMapping("/{tournamentId}/competitions/{id}/inscriptions")
-    public ResponseEntity<Page<ParticipanteResponseDTO>> listInscriptionsByCompetition(
+    public ResponseEntity<Page<InscripcionResponseDTO>> listInscriptionsByCompetition(
             @PathVariable Long tournamentId,
             @PathVariable Long id,
             Pageable pageable) {
-        Page<ParticipanteResponseDTO> inscriptions = service.listInscriptionsByCompetition(tournamentId, id, pageable);
+        Page<InscripcionResponseDTO> inscriptions = service.listInscriptionsByCompetition(tournamentId, id, pageable);
         return ResponseEntity.ok(inscriptions);
     }
 }

@@ -13,6 +13,7 @@ import com.poo.proyecto.entity.base.Documento;
 import com.poo.proyecto.entity.base.Email;
 import com.poo.proyecto.mapper.ParticipanteMapper;
 import com.poo.proyecto.mapper.UserAccountMapper;
+import com.poo.proyecto.mapper.common.EmailMapper;
 import com.poo.proyecto.repository.InscripcionRepository;
 import com.poo.proyecto.repository.ParticipanteRepository;
 import com.poo.proyecto.repository.RoleRepository;
@@ -50,21 +51,24 @@ public class ParticipanteServiceImpl extends BaseServiceSupport implements Parti
     @Override
     @Transactional
     public ParticipanteResponseDTO create(CreateParticipanteDTO dto) {
+        // 1. Validaciones
         check(!repo.existsByDocumento_TipoAndDocumento_Numero(dto.getDocumento().getTipo(), dto.getDocumento().getNumero()),
                 "Ya existe un participante con ese documento");
+        check(!userRepo.existsByEmail_Value(dto.getEmail()), "Ya existe un participante con ese email");
 
-        check(!userRepo.existsByEmail_Value(dto.getEmail().getValue()), "Ya existe un participante con ese email");
-
+        // 2. Crear UserAccount (El userAccountService usará el mapper con el nuevo EmailMapper)
         CreateUserDTO dtoUser = new CreateUserDTO();
         dtoUser.setEmail(dto.getEmail());
         dtoUser.setPassword(dto.getPassword());
+
         Long newUserId = this.userAccountService.create(dtoUser, "ROLE_PARTICIPANT").getId();
-        UserAccount ua = orNotFound(userRepo.findById(newUserId), "UserAccount no encontrado despues de creacion");
+        UserAccount ua = orNotFound(userRepo.findById(newUserId), "UserAccount no encontrado");
 
+        // 3. Crear Participante (Ahora el mapper SI mapea el email correctamente)
         Participante p = mapper.toEntity(dto);
-
         p.setUserAccount(ua);
 
+        // 4. Guardar
         return mapper.toResponse(repo.save(p));
     }
 

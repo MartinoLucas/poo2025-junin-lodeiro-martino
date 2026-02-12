@@ -25,6 +25,14 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                    var corsConfiguration = new org.springframework.web.cors.CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(java.util.List.of("http://localhost:3000"));
+                    corsConfiguration.setAllowedMethods(java.util.List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+                    corsConfiguration.setAllowedHeaders(java.util.List.of("*"));
+                    corsConfiguration.setAllowCredentials(true);
+                    return corsConfiguration;
+                }))
                 .csrf(csrf -> csrf.disable())
                 .addFilterBefore(
                         new JwtAuthorizationFilter(jwtTokenUtil),
@@ -34,12 +42,13 @@ public class SecurityConfig {
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/admin/auth").permitAll()
                         .requestMatchers(HttpMethod.POST, "/accounts").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/tournaments/**").permitAll()
 
                         // solo admin
                         .requestMatchers("/admin/**").hasRole("ADMIN")
 
                         // resto requiere ADMIN o PARTICIPANTE
-                        .requestMatchers("/**").hasAnyRole("ADMIN", "PARTICIPANTE")
+                        .requestMatchers("/**").hasAnyRole("ADMIN", "PARTICIPANT")
                 )
         ;
 

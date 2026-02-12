@@ -16,10 +16,11 @@ public class JwtTokenUtil {
     private static final long EXPIRATION = 1000L * 60 * 60 * 24 * 10; // 10 días
     private final Algorithm algorithm = Algorithm.HMAC512(SECRET);
 
-    public String generateToken(String subject, List<String> roles) {
+    public String generateToken(String subject, List<String> roles, Long userId) {
         String token = JWT.create()
                 .withSubject(subject)               // Asigna el "dueño" del token (usuario)
                 .withClaim("roles", roles)  // Agrega roles dentro del toke
+                .withClaim("sub_id", userId)
                 .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION))  // Fecha de expiración
 
                 .sign(algorithm);   // Firma el token usando HMAC512

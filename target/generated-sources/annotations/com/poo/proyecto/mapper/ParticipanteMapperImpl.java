@@ -1,5 +1,6 @@
 package com.poo.proyecto.mapper;
 
+import com.poo.proyecto.dto.common.EmailDTO;
 import com.poo.proyecto.dto.participante.CreateParticipanteDTO;
 import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.participante.UpdateParticipanteDTO;
@@ -8,6 +9,7 @@ import com.poo.proyecto.dto.user.UserResponseDTO;
 import com.poo.proyecto.entity.Participante;
 import com.poo.proyecto.entity.Role;
 import com.poo.proyecto.entity.UserAccount;
+import com.poo.proyecto.entity.base.Email;
 import com.poo.proyecto.mapper.common.DocumentoMapper;
 import com.poo.proyecto.mapper.common.EmailMapper;
 import java.util.LinkedHashSet;
@@ -18,7 +20,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-26T10:38:01-0300",
+    date = "2026-01-29T19:33:48-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Microsoft)"
 )
 @Component
@@ -61,7 +63,10 @@ public class ParticipanteMapperImpl implements ParticipanteMapper {
             entity.setDocumento( documentoMapper.toEntity( dto.getDocumento() ) );
         }
         if ( dto.getEmail() != null ) {
-            entity.setEmail( emailMapper.toEntity( dto.getEmail() ) );
+            if ( entity.getEmail() == null ) {
+                entity.setEmail( new Email() );
+            }
+            emailDTOToEmail( dto.getEmail(), entity.getEmail() );
         }
     }
 
@@ -81,6 +86,16 @@ public class ParticipanteMapperImpl implements ParticipanteMapper {
         participanteResponseDTO.setEmail( emailMapper.toDto( entity.getEmail() ) );
 
         return participanteResponseDTO;
+    }
+
+    protected void emailDTOToEmail(EmailDTO emailDTO, Email mappingTarget) {
+        if ( emailDTO == null ) {
+            return;
+        }
+
+        if ( emailDTO.getValue() != null ) {
+            mappingTarget.setValue( emailDTO.getValue() );
+        }
     }
 
     protected RoleResponseDTO roleToRoleResponseDTO(Role role) {

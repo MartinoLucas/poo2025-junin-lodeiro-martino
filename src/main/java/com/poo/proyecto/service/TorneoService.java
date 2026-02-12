@@ -3,6 +3,7 @@ package com.poo.proyecto.service;
 import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
 import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
 import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
+import com.poo.proyecto.dto.inscripcion.InscripcionResponseDTO;
 import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.torneo.CreateTorneoDTO;
 import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
@@ -27,5 +28,5 @@ public interface TorneoService {
     CompetenciaResponseDTO getByTorneoIdByCompetitionId(Long torunamentId, Long id);
     CompetenciaResponseDTO createCompetitionInTournament(Long tournamentId, CreateCompetenciaDTO dto);
     CompetenciaResponseDTO updateCompetitionInTournament(Long tournamentId, Long competitionId, UpdateCompetenciaDTO dto);
-    Page<ParticipanteResponseDTO> listInscriptionsByCompetition(Long tournamentId, Long competitionId, Pageable pageable);
+    Page<InscripcionResponseDTO> listInscriptionsByCompetition(Long tournamentId, Long competitionId, Pageable pageable);
 }

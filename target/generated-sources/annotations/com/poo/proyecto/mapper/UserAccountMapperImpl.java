@@ -15,16 +15,16 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-11-26T10:38:01-0300",
+    date = "2026-02-11T09:17:40-0300",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 21.0.8 (Microsoft)"
 )
 @Component
 public class UserAccountMapperImpl implements UserAccountMapper {
 
     @Autowired
-    private EmailMapper emailMapper;
-    @Autowired
     private RoleMapper roleMapper;
+    @Autowired
+    private EmailMapper emailMapper;
 
     @Override
     public UserAccount toEntity(CreateUserDTO dto) {
@@ -44,10 +44,6 @@ public class UserAccountMapperImpl implements UserAccountMapper {
         if ( dto == null ) {
             return;
         }
-
-        if ( dto.getEmail() != null ) {
-            entity.setEmail( emailMapper.toEntity( dto.getEmail() ) );
-        }
     }
 
     @Override
@@ -59,6 +55,7 @@ public class UserAccountMapperImpl implements UserAccountMapper {
         UserResponseDTO userResponseDTO = new UserResponseDTO();
 
         userResponseDTO.setRoles( roleSetToRoleResponseDTOSet( entity.getRoles() ) );
+        userResponseDTO.setDeletedAt( entity.getDeletedAt() );
         userResponseDTO.setId( entity.getId() );
         userResponseDTO.setEmail( emailMapper.toDto( entity.getEmail() ) );
         userResponseDTO.setCreatedAt( entity.getCreatedAt() );

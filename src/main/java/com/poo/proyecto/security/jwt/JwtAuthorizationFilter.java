@@ -33,6 +33,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         // ignoramos /auth y POST /accounts
         if (path.startsWith("/auth") || path.startsWith("/admin/auth")) return true;
         if (path.equals("/accounts") && method.equals("POST")) return true;
+        if (path.startsWith("/tournaments") && method.equals("GET")) return true;
 
         return false;
     }

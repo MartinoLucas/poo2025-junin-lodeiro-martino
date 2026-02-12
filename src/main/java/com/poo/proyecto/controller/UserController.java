@@ -25,7 +25,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<Page<UserResponseDTO>> list(Pageable pageable ) {
-        return ResponseEntity.ok(service.listActiveAdmin(pageable));
+        return ResponseEntity.ok(service.listAdmin(pageable));
     }
 
     @GetMapping("/{id}")

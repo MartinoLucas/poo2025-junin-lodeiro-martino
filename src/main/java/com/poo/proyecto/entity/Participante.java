@@ -36,20 +36,20 @@ public class Participante extends Auditable {
     @Embedded
     private Documento documento;
 
-//    @Embedded
-//    @AttributeOverride(name = "value", column = @Column(name = "email", length = 255, nullable = false))
-//    private Email email;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "email", length = 255, nullable = false))
+    private Email email;
 
     public Long getId() { return id; }
     public UserAccount getUserAccount() { return userAccount; }
     public String getNombre() { return nombre; }
     public String getApellido() { return apellido; }
     public Documento getDocumento() { return documento; }
-//  public Email getEmail() { return email; }
+    public Email getEmail() { return email; }
 
     public void setUserAccount(UserAccount userAccount) { this.userAccount = userAccount; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public void setApellido(String apellido) { this.apellido = apellido; }
     public void setDocumento(Documento documento) { this.documento = documento; }
-//  public void setEmail(Email email) { this.email = email; }
+    public void setEmail(Email email) { this.email = email; }
 }

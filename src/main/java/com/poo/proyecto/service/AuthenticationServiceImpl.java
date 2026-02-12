@@ -7,6 +7,7 @@ import com.poo.proyecto.exception.ForbiddenException;
 import com.poo.proyecto.repository.UserAccountRepository;
 import com.poo.proyecto.util.JwtTokenUtil;
 import com.poo.proyecto.util.PasswordEncoder;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,7 +31,9 @@ public class AuthenticationServiceImpl  extends BaseServiceSupport implements Au
 
         check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), () -> new ForbiddenException("Credenciales Invalidas"));
 
-        return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList());
+        check(user.getDeletedAt() == null, () -> new DisabledException("Cuenta Desactivada"));
+
+        return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList(), user.getId());
     }
 
     @Override
@@ -41,6 +44,6 @@ public class AuthenticationServiceImpl  extends BaseServiceSupport implements Au
 
         check(passwordEncoder.verify(dto.getPassword(), user.getPasswordHash()), "Credenciales Invalidas" );
 
-        return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList());
+        return jwtTokenUtil.generateToken(user.getEmail().value(), user.getRoles().stream().map(Role::getName).toList(), user.getId());
     }
 }

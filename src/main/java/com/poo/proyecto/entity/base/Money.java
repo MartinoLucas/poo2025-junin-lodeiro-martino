@@ -18,7 +18,7 @@ public class Money {
     @Column(name = "currency", length = 3, nullable = false)
     private String currency = "ARS";
 
-    protected Money() { }
+    public Money() { }
 
     public Money(BigDecimal amount) {
         this.amount = amount == null ? null : amount.setScale(2);
@@ -40,4 +40,12 @@ public class Money {
     }
     @Override public int hashCode() { return Objects.hash(amount, currency); }
     @Override public String toString() { return amount + " " + currency; }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setCurrency(String ars) {
+        this.currency = ars;
+    }
 }

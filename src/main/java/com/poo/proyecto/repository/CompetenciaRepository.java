@@ -27,4 +27,5 @@ public interface CompetenciaRepository extends JpaRepository<Competencia, Long> 
     @EntityGraph(attributePaths = { "torneo" })
     Optional<Competencia> findWithTorneoById(Long id);
 
+    int countByTorneoId(Long torneoId);
 }

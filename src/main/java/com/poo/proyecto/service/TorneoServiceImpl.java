@@ -3,6 +3,7 @@ package com.poo.proyecto.service;
 import com.poo.proyecto.dto.competencia.CompetenciaResponseDTO;
 import com.poo.proyecto.dto.competencia.CreateCompetenciaDTO;
 import com.poo.proyecto.dto.competencia.UpdateCompetenciaDTO;
+import com.poo.proyecto.dto.inscripcion.InscripcionResponseDTO;
 import com.poo.proyecto.dto.participante.ParticipanteResponseDTO;
 import com.poo.proyecto.dto.torneo.CreateTorneoDTO;
 import com.poo.proyecto.dto.torneo.TorneoResponseDTO;
@@ -11,6 +12,7 @@ import com.poo.proyecto.entity.Torneo;
 import com.poo.proyecto.entity.TorneoStatus;
 
 import com.poo.proyecto.mapper.TorneoMapper;
+import com.poo.proyecto.repository.CompetenciaRepository;
 import com.poo.proyecto.repository.TorneoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,13 +31,15 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     private final TorneoRepository repo;
     private final TorneoMapper mapper;
     private final CompetenciaService competenciaService;
-    private final ParticipanteService participanteService;
+    private final InscripcionService inscripcionService;
+    private final CompetenciaRepository competenciaRepository;
 
-    public TorneoServiceImpl(TorneoRepository repo, TorneoMapper mapper, CompetenciaService competenciaService, ParticipanteService participanteService) {
+    public TorneoServiceImpl(TorneoRepository repo, TorneoMapper mapper, CompetenciaService competenciaService, InscripcionService inscripcionService, CompetenciaRepository competenciaRepository) {
         this.repo = repo;
         this.mapper = mapper;
         this.competenciaService = competenciaService;
-        this.participanteService = participanteService;
+        this.inscripcionService = inscripcionService;
+        this.competenciaRepository = competenciaRepository;
     }
 
     @Override @Transactional
@@ -111,7 +115,11 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
 
     @Override @Transactional(readOnly = true)
     public Page<TorneoResponseDTO> listAll(Pageable pageable) {
-        return repo.findAll(pageable).map(mapper::toResponse);
+        return repo.findAll(pageable).map(torneo -> {
+            TorneoResponseDTO dto = mapper.toResponse(torneo);
+            dto.setCantCompetencias(competenciaRepository.countByTorneoId(torneo.getId()));
+            return dto;
+        });
     }
 
     @Override @Transactional(readOnly = true)
@@ -135,7 +143,8 @@ public class TorneoServiceImpl  extends BaseServiceSupport implements TorneoServ
     }
 
     @Override
-    public Page<ParticipanteResponseDTO> listInscriptionsByCompetition(Long tournamentId, Long competitionId, Pageable pageable) {
-        return this.participanteService.listByCompetitionId(competitionId, pageable);
+    public Page<InscripcionResponseDTO> listInscriptionsByCompetition(Long tournamentId, Long competitionId, Pageable pageable) {
+        //return this.participanteService.listByCompetitionId(competitionId, pageable);
+        return this.inscripcionService.listByCompetitionId(competitionId, pageable);
     }
 }

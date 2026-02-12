@@ -17,4 +17,6 @@ public interface InscripcionService {
     Page<InscripcionResponseDTO> list(Pageable pageable);
 
     Page<InscripcionResponseDTO> listByParticipanteId(Long participanteId, Pageable pageable);
+
+    Page<InscripcionResponseDTO> listByCompetitionId(Long competitionId, Pageable pageable);
 }

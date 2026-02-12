@@ -13,6 +13,7 @@ public class TorneoResponseDTO {
     private TorneoStatus estado;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private int cantCompetencias;
 
     public Long getId() {
         return id;
@@ -76,5 +77,13 @@ public class TorneoResponseDTO {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getCantCompetencias() {
+        return cantCompetencias;
+    }
+
+    public void setCantCompetencias(int cantCompetencias) {
+        this.cantCompetencias = cantCompetencias;
     }
 }

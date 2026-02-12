@@ -4,6 +4,7 @@ import com.poo.proyecto.exception.ForbiddenException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,17 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(DisabledException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiError handleDisabled(DisabledException ex, HttpServletRequest request) {
+        return new ApiError(
+                "account_disabled",
+                "Cuenta desactivada",
+                403,
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+    }
     @ExceptionHandler(ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiError handleForbidden(ForbiddenException ex, HttpServletRequest request) {

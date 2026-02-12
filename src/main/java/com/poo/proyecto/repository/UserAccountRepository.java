@@ -43,5 +43,13 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
        """)
     Page<UserAccount> findActiveByRole(@Param("role") String role, Pageable pageable);
 
+    @Query("""
+       SELECT DISTINCT u
+       FROM UserAccount u
+       JOIN u.roles r
+       WHERE r.name = :role
+       """)
+    Page<UserAccount> findByRole(@Param("role")String role, Pageable pageable);
+
 }
 
